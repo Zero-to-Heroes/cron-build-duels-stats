@@ -19,7 +19,6 @@ export const buildSignatureTreasureStats = async (
 	const startDateStatemenet = startDate ? `AND t1.creationDate >= '${formatDate(startDate)}' ` : '';
 
 	const endDate = new Date();
-	endDate.setHours(0, 0, 0, 0);
 	const periodDate = formatDate(endDate);
 
 	const allSignatureTreasuresQuery = `

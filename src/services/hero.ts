@@ -15,7 +15,6 @@ export const buildHeroStats = async (mysql, cards): Promise<readonly HeroStat[]>
 	const startDateStatemenet = startDate ? `AND creationDate >= '${formatDate(startDate)}' ` : '';
 
 	const endDate = new Date();
-	endDate.setHours(0, 0, 0, 0);
 	const periodDate = formatDate(endDate);
 
 	const allHeroesQuery = `
