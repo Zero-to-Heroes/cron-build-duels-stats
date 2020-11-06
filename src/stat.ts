@@ -33,6 +33,16 @@ export interface TreasureStat {
 	readonly playerClass: string;
 	readonly totalOffered: number;
 	readonly totalPicked: number;
-	//readonly winrateWhileInDeck: number;
-	// Something about a winrate per class?
+}
+
+export interface DeckStat {
+	readonly periodStart: string;
+	readonly decklist: string;
+	readonly playerClass: string;
+	readonly heroPowerCardId: string;
+	readonly signatureTreasureCardId: string;
+	readonly treasuresCardIds: readonly string[];
+	readonly runId: string;
+	readonly rating: number;
+	readonly runStartDate: string;
 }

@@ -24,6 +24,7 @@ export default async (event): Promise<any> => {
 	const heroPowerStats = await buildHeroPowerStats(mysql, cards);
 	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards);
 	const treasureStats = await buildTreasureStats(mysql);
+	// const decks = await buildDecks(mysql, cards);
 
 	return { statusCode: 200, body: null };
 };

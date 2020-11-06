@@ -45,7 +45,7 @@ export const buildHeroStats = async (mysql, cards): Promise<readonly HeroStat[]>
 	const allHeroesWonResult: readonly any[] = await mysql.query(allHeroesWonQuery);
 	console.log('allHeroesWonResult', allHeroesWonResult);
 
-	const totalGames = allHeroesResult.map(result => result.count).reduce((a, b) => a + b, 0);
+	// const totalGames = allHeroesResult.map(result => result.count).reduce((a, b) => a + b, 0);
 	const stats = allHeroesResult.map(
 		result =>
 			({
