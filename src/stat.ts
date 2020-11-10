@@ -9,6 +9,15 @@ export interface HeroStat {
 	readonly totalWins: number;
 }
 
+export interface HeroPositionStat {
+	readonly creationDate: string;
+	readonly periodStart: string;
+	readonly heroCardId: string;
+	readonly heroClass: ReferencePlayerClass;
+	readonly totalMatches: number;
+	readonly totalWins: number;
+}
+
 export interface HeroPowerStat {
 	readonly creationDate: string;
 	readonly periodStart: string;

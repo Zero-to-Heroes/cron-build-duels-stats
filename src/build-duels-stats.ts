@@ -2,6 +2,7 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { getConnection } from './db/rds';
 import { buildHeroStats } from './services/hero';
+import { buildHeroPositionStats } from './services/hero-position';
 import { buildHeroPowerStats } from './services/hero-power';
 import { buildSignatureTreasureStats } from './services/signature-treasure';
 import { buildTreasureStats } from './services/treasure';
@@ -24,7 +25,7 @@ export default async (event): Promise<any> => {
 	const heroPowerStats = await buildHeroPowerStats(mysql, cards);
 	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards);
 	const treasureStats = await buildTreasureStats(mysql);
-	// const decks = await buildDecks(mysql, cards);
+	const heroPositionStats = await buildHeroPositionStats(mysql, cards);
 
 	return { statusCode: 200, body: null };
 };
