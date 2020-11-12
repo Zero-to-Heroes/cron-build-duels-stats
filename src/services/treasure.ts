@@ -1,9 +1,10 @@
 import { TreasureStat } from '../stat';
 import { formatDate } from '../utils/util-functions';
 
-export const buildTreasureStats = async (mysql): Promise<readonly TreasureStat[]> => {
+export const buildTreasureStats = async (mysql, gameMode: 'duels' | 'paid-duels'): Promise<readonly TreasureStat[]> => {
 	const lastJobQuery = `
 		SELECT periodStart FROM duels_stats_treasure
+		WHERE gameMode = '${gameMode}'
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
@@ -23,7 +24,7 @@ export const buildTreasureStats = async (mysql): Promise<readonly TreasureStat[]
 		INNER JOIN replay_summary t2 ON t1.reviewId = t2.reviewId
 		AND t2.playerCardId like 'PVPDR_Hero%'
 		${startDateStatemenet}
-		WHERE t1.adventureType = 'duels'
+		WHERE t1.adventureType = '${gameMode}'
 		AND t1.bundleType = 'treasure'
 		ORDER BY t2.playerClass;
 	`;
@@ -76,12 +77,12 @@ export const buildTreasureStats = async (mysql): Promise<readonly TreasureStat[]
 	const values = stats
 		.map(
 			stat =>
-				`('${stat.periodStart}', '${stat.cardId}', '${stat.playerClass}', ${stat.totalOffered}, ${stat.totalPicked})`,
+				`('${gameMode}', '${stat.periodStart}', '${stat.cardId}', '${stat.playerClass}', ${stat.totalOffered}, ${stat.totalPicked})`,
 		)
 		.join(',\n');
 	const insertionQuery = `
 		INSERT INTO duels_stats_treasure
-		(periodStart, cardId, playerClass, totalOffered, totalPicked)
+		(gameMode, periodStart, cardId, playerClass, totalOffered, totalPicked)
 		VALUES ${values}
 	`;
 	console.log('running query', insertionQuery);

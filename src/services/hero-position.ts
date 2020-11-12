@@ -1,9 +1,14 @@
 import { HeroPositionStat, HeroStat } from '../stat';
 import { formatDate } from '../utils/util-functions';
 
-export const buildHeroPositionStats = async (mysql, cards): Promise<readonly HeroStat[]> => {
+export const buildHeroPositionStats = async (
+	mysql,
+	cards,
+	gameMode: 'duels' | 'paid-duels',
+): Promise<readonly HeroStat[]> => {
 	const lastJobQuery = `
 		SELECT periodStart FROM duels_stats_hero_position
+		WHERE gameMode = '${gameMode}'
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
@@ -20,7 +25,7 @@ export const buildHeroPositionStats = async (mysql, cards): Promise<readonly Her
 	const allHeroesQuery = `
 		SELECT playerCardId, SUBSTRING_INDEX(additionalResult, '-', 1) AS wins, result, COUNT(*) as count
 		FROM replay_summary
-		WHERE gameMode = 'duels' 
+		WHERE gameMode = '${gameMode}' 
 		AND playerCardId LIKE 'PVPDR_Hero%'
 		AND (
 			(SUBSTRING_INDEX(additionalResult, '-', 1) = 11 AND result = 'won')
@@ -52,11 +57,11 @@ export const buildHeroPositionStats = async (mysql, cards): Promise<readonly Her
 	const values = stats
 		.map(
 			stat =>
-				`('${stat.periodStart}', '${stat.heroCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
+				`('${gameMode}', '${stat.periodStart}', '${stat.heroCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
 		)
 		.join(',\n');
 	const query = `
-		INSERT INTO duels_stats_hero_position (periodStart, heroCardId, heroClass, totalMatches, totalWins)
+		INSERT INTO duels_stats_hero_position (gameMode, periodStart, heroCardId, heroClass, totalMatches, totalWins)
 		VALUES ${values}
 	`;
 	console.log('running query', query);

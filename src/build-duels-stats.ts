@@ -21,11 +21,11 @@ export default async (event): Promise<any> => {
 	// const today = toCreationDate(new Date());
 	// const earliestStartDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
 
-	const heroStats = await buildHeroStats(mysql, cards);
-	const heroPowerStats = await buildHeroPowerStats(mysql, cards);
-	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards);
-	const treasureStats = await buildTreasureStats(mysql);
-	const heroPositionStats = await buildHeroPositionStats(mysql, cards);
+	const heroStats = await buildHeroStats(mysql, cards, 'duels');
+	const heroPowerStats = await buildHeroPowerStats(mysql, cards, 'duels');
+	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards, 'duels');
+	const treasureStats = await buildTreasureStats(mysql, 'duels');
+	const heroPositionStats = await buildHeroPositionStats(mysql, cards, 'duels');
 
 	return { statusCode: 200, body: null };
 };

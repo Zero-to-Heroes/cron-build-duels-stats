@@ -5,9 +5,11 @@ import { formatDate } from '../utils/util-functions';
 export const buildSignatureTreasureStats = async (
 	mysql,
 	cards: AllCardsService,
+	gameMode: 'duels' | 'paid-duels',
 ): Promise<readonly SignatureTreasureStat[]> => {
 	const lastJobQuery = `
 		SELECT periodStart FROM duels_stats_signature_treasure
+		WHERE gameMode = '${gameMode}'
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
@@ -26,7 +28,7 @@ export const buildSignatureTreasureStats = async (
 		FROM replay_summary t1
 		INNER JOIN match_stats t3 ON t3.reviewId = t1.reviewId
 		INNER JOIN dungeon_run_loot_info t2 ON t3.statValue = t2.runId
-		WHERE t1.gameMode = 'duels' 
+		WHERE t1.gameMode = '${gameMode}' 
 		AND t1.playerCardId like 'PVPDR_Hero%'
 		${startDateStatemenet}
 		AND t2.bundleType = 'signature-treasure'
@@ -47,7 +49,7 @@ export const buildSignatureTreasureStats = async (
 		FROM replay_summary t1
 		INNER JOIN match_stats t3 ON t3.reviewId = t1.reviewId
 		INNER JOIN dungeon_run_loot_info t2 ON t3.statValue = t2.runId
-		WHERE t1.gameMode = 'duels' 
+		WHERE t1.gameMode = '${gameMode}' 
 		AND t1.playerCardId like 'PVPDR_Hero%'
 		${startDateStatemenet}
 		AND t1.result = 'won'
@@ -75,11 +77,11 @@ export const buildSignatureTreasureStats = async (
 	const values = stats
 		.map(
 			stat =>
-				`('${stat.periodStart}', '${stat.signatureTreasureCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
+				`('${gameMode}', '${stat.periodStart}', '${stat.signatureTreasureCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
 		)
 		.join(',\n');
 	const query = `
-		INSERT INTO duels_stats_signature_treasure (periodStart, signatureTreasureCardId, heroClass, totalMatches, totalWins)
+		INSERT INTO duels_stats_signature_treasure (gameMode, periodStart, signatureTreasureCardId, heroClass, totalMatches, totalWins)
 		VALUES ${values}
 	`;
 	console.log('running query', query);
