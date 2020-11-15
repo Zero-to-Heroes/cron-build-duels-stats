@@ -1,13 +1,13 @@
-import { HeroPowerStat } from '../stat';
+import { SignatureTreasureStat } from '../stat';
 import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
-export const buildHeroPowerPositionStats = async (
+export const buildSignatureTreasurePositionStats = async (
 	mysql,
 	cards,
 	gameMode: 'duels' | 'paid-duels',
-): Promise<readonly HeroPowerStat[]> => {
+): Promise<readonly SignatureTreasureStat[]> => {
 	const lastJobQuery = `
-		SELECT periodStart FROM duels_stats_hero_power_position
+		SELECT periodStart FROM duels_stats_signature_treasure_position
 		WHERE gameMode = '${gameMode}'
 		ORDER BY periodStart DESC
 		LIMIT 1
@@ -22,8 +22,8 @@ export const buildHeroPowerPositionStats = async (
 	const endDate = new Date();
 	const periodDate = formatDate(endDate);
 
-	const allHeroPowersQuery = `
-		SELECT t2.option1 AS heroPower, SUBSTRING_INDEX(t1.additionalResult, '-', 1) AS wins, t1.result, COUNT(*) as count
+	const allHeroesQuery = `
+		SELECT t2.option1 as signatureTreasure, SUBSTRING_INDEX(t1.additionalResult, '-', 1) AS wins, t1.result, COUNT(*) as count
 		FROM replay_summary t1
 		INNER JOIN match_stats t3 ON t3.reviewId = t1.reviewId
 		INNER JOIN dungeon_run_loot_info t2 ON t3.statValue = t2.runId
@@ -34,37 +34,37 @@ export const buildHeroPowerPositionStats = async (
 			OR (SUBSTRING_INDEX(t1.additionalResult, '-', -1) = 2 AND t1.result = 'lost')
 		)
 		${startDateStatemenet}
-		AND t2.bundleType = 'hero-power'
+		AND t2.bundleType = 'signature-treasure'
 		AND t3.statName = 'duels-run-id'
-		GROUP BY heroPower, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
+		GROUP BY signatureTreasure, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
 	`;
-	console.log('running query', allHeroPowersQuery);
-	const allHeroPowersResult: readonly any[] = await mysql.query(allHeroPowersQuery);
+	console.log('running query', allHeroesQuery);
+	const allHeroesResult: readonly any[] = await mysql.query(allHeroesQuery);
 	// console.log('allHeroPowersResult', allHeroPowersResult);
 
-	if (!allHeroPowersResult || allHeroPowersResult.length === 0) {
+	if (!allHeroesResult || allHeroesResult.length === 0) {
 		console.log('no new hero power info');
 		return;
 	}
 
-	const stats = allHeroPowersResult.map(
+	const stats = allHeroesResult.map(
 		result =>
 			({
 				periodStart: periodDate,
-				heroPowerCardId: getCardFromCardId(result.heroPower, cards)?.id,
-				heroClass: getCardFromCardId(result.heroPower, cards)?.playerClass,
+				signatureTreasureCardId: getCardFromCardId(result.signatureTreasure, cards)?.id,
+				heroClass: getCardFromCardId(result.signatureTreasure, cards)?.playerClass,
 				totalMatches: result.count,
 				totalWins: result.result === 'won' ? +result.wins + 1 : +result.wins,
-			} as HeroPowerStat),
+			} as SignatureTreasureStat),
 	);
 	const values = stats
 		.map(
 			stat =>
-				`('${gameMode}', '${stat.periodStart}', '${stat.heroPowerCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
+				`('${gameMode}', '${stat.periodStart}', '${stat.signatureTreasureCardId}', '${stat.heroClass}', ${stat.totalMatches}, ${stat.totalWins})`,
 		)
 		.join(',\n');
 	const query = `
-		INSERT INTO duels_stats_hero_power_position (gameMode, periodStart, heroPowerCardId, heroClass, totalMatches, totalWins)
+		INSERT INTO duels_stats_signature_treasure_position (gameMode, periodStart, signatureTreasureCardId, heroClass, totalMatches, totalWins)
 		VALUES ${values}
 	`;
 	// console.log('running query', query);

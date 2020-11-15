@@ -1,5 +1,5 @@
 import { HeroPositionStat, HeroStat } from '../stat';
-import { formatDate } from '../utils/util-functions';
+import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
 export const buildHeroPositionStats = async (
 	mysql,
@@ -48,8 +48,8 @@ export const buildHeroPositionStats = async (
 		result =>
 			({
 				periodStart: periodDate,
-				heroCardId: result.playerCardId,
-				heroClass: cards.getCard(result.playerCardId)?.playerClass,
+				heroCardId: getCardFromCardId(result.playerCardId, cards)?.id,
+				heroClass: getCardFromCardId(result.playerCardId, cards)?.playerClass,
 				totalMatches: result.count,
 				totalWins: result.result === 'won' ? +result.wins + 1 : +result.wins,
 			} as HeroPositionStat),

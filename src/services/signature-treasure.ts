@@ -1,6 +1,6 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { SignatureTreasureStat } from '../stat';
-import { formatDate } from '../utils/util-functions';
+import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
 export const buildSignatureTreasureStats = async (
 	mysql,
@@ -66,8 +66,8 @@ export const buildSignatureTreasureStats = async (
 		result =>
 			({
 				periodStart: periodDate,
-				signatureTreasureCardId: result.signatureTreasure,
-				heroClass: cards.getCard(result.signatureTreasure)?.playerClass,
+				signatureTreasureCardId: getCardFromCardId(result.signatureTreasure, cards)?.id,
+				heroClass: getCardFromCardId(result.signatureTreasure, cards)?.playerClass,
 				totalMatches: result.count,
 				totalWins:
 					allSignatureTreasuresWonResult.find(hero => hero.signatureTreasure === result.signatureTreasure)

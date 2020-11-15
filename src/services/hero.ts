@@ -1,5 +1,5 @@
 import { HeroStat } from '../stat';
-import { formatDate } from '../utils/util-functions';
+import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
 export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-duels'): Promise<readonly HeroStat[]> => {
 	const lastJobQuery = `
@@ -51,8 +51,8 @@ export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-due
 		result =>
 			({
 				periodStart: periodDate,
-				heroCardId: result.playerCardId,
-				heroClass: cards.getCard(result.playerCardId)?.playerClass,
+				heroCardId: getCardFromCardId(result.playerCardId, cards)?.id,
+				heroClass: getCardFromCardId(result.playerCardId, cards)?.playerClass,
 				totalMatches: result.count,
 				totalWins: allHeroesWonResult.find(hero => hero.playerCardId === result.playerCardId)?.count || 0,
 			} as HeroStat),

@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { getConnection } from './db/rds';
-import { buildHeroStats } from './services/hero';
-import { buildHeroPositionStats } from './services/hero-position';
-import { buildHeroPowerStats } from './services/hero-power';
-import { buildSignatureTreasureStats } from './services/signature-treasure';
-import { buildTreasureStats } from './services/treasure';
+import { buildSignatureTreasurePositionStats } from './services/signature-treasure-position';
 
 const cards = new AllCardsService();
 
@@ -21,11 +17,13 @@ export default async (event): Promise<any> => {
 	// const today = toCreationDate(new Date());
 	// const earliestStartDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
 
-	const heroStats = await buildHeroStats(mysql, cards, 'duels');
-	const heroPowerStats = await buildHeroPowerStats(mysql, cards, 'duels');
-	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards, 'duels');
-	const treasureStats = await buildTreasureStats(mysql, 'duels');
-	const heroPositionStats = await buildHeroPositionStats(mysql, cards, 'duels');
+	// const heroStats = await buildHeroStats(mysql, cards, 'duels');
+	// const heroPowerStats = await buildHeroPowerStats(mysql, cards, 'duels');
+	// const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards, 'duels');
+	// const treasureStats = await buildTreasureStats(mysql, 'duels');
+	// const heroPositionStats = await buildHeroPositionStats(mysql, cards, 'duels');
+	// const heroPowerPositionStats = await buildHeroPowerPositionStats(mysql, cards, 'duels');
+	const signatureTreasurePositionStats = await buildSignatureTreasurePositionStats(mysql, cards, 'duels');
 
 	return { statusCode: 200, body: null };
 };

@@ -1,5 +1,5 @@
 import { HeroPowerStat } from '../stat';
-import { formatDate } from '../utils/util-functions';
+import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
 export const buildHeroPowerStats = async (
 	mysql,
@@ -65,8 +65,8 @@ export const buildHeroPowerStats = async (
 		result =>
 			({
 				periodStart: periodDate,
-				heroPowerCardId: result.heroPower,
-				heroClass: cards.getCard(result.heroPower)?.playerClass,
+				heroPowerCardId: getCardFromCardId(result.heroPower, cards)?.id,
+				heroClass: getCardFromCardId(result.heroPower, cards)?.playerClass,
 				totalMatches: result.count,
 				totalWins: allHeroPowersWonResult.find(hero => hero.heroPower === result.heroPower)?.count || 0,
 			} as HeroPowerStat),
