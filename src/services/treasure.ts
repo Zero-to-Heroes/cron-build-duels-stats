@@ -1,7 +1,11 @@
-import { TreasureStat } from '../stat';
-import { formatDate } from '../utils/util-functions';
+import { AllCardsService } from '@firestone-hs/reference-data';
+import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
-export const buildTreasureStats = async (mysql, gameMode: 'duels' | 'paid-duels'): Promise<readonly TreasureStat[]> => {
+export const buildTreasureStats = async (
+	mysql,
+	cards: AllCardsService,
+	gameMode: 'duels' | 'paid-duels',
+): Promise<readonly MutableTreasureStat[]> => {
 	const lastJobQuery = `
 		SELECT periodStart FROM duels_stats_treasure
 		WHERE gameMode = '${gameMode}'
@@ -45,6 +49,7 @@ export const buildTreasureStats = async (mysql, gameMode: 'duels' | 'paid-duels'
 			dbRow,
 			periodDate,
 			(dbRow: InternalTreasureRow) => dbRow.option1,
+			cards,
 		);
 		option1Treasure.totalOffered++;
 		if (dbRow.chosenOptionIndex === 1) {
@@ -56,6 +61,7 @@ export const buildTreasureStats = async (mysql, gameMode: 'duels' | 'paid-duels'
 			dbRow,
 			periodDate,
 			(dbRow: InternalTreasureRow) => dbRow.option2,
+			cards,
 		);
 		option2Treasure.totalOffered++;
 		if (dbRow.chosenOptionIndex === 2) {
@@ -67,6 +73,7 @@ export const buildTreasureStats = async (mysql, gameMode: 'duels' | 'paid-duels'
 			dbRow,
 			periodDate,
 			(dbRow: InternalTreasureRow) => dbRow.option3,
+			cards,
 		);
 		option3Treasure.totalOffered++;
 		if (dbRow.chosenOptionIndex === 3) {
@@ -95,6 +102,7 @@ const findTreasureAndInsertIfMissing = (
 	dbRow: InternalTreasureRow,
 	periodStart: string,
 	extractor: (dbRow: InternalTreasureRow) => string,
+	cards: AllCardsService,
 ): MutableTreasureStat => {
 	const treasureId = extractor(dbRow);
 	let treasure: MutableTreasureStat = stats.find(
@@ -102,7 +110,7 @@ const findTreasureAndInsertIfMissing = (
 	);
 	if (!treasure) {
 		treasure = {
-			cardId: treasureId,
+			cardId: getCardFromCardId(treasureId, cards)?.id,
 			periodStart: periodStart,
 			playerClass: dbRow.playerClass,
 			totalOffered: 0,

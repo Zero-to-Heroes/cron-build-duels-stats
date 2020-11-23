@@ -1,6 +1,5 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { ReferenceCard } from '@firestone-hs/reference-data/lib/models/reference-cards/reference-card';
-import { Map } from 'immutable';
 import fetch, { RequestInfo } from 'node-fetch';
 
 function partitionArray<T>(array: readonly T[], partitionSize: number): readonly T[][] {
@@ -35,19 +34,12 @@ async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function groupBy(list, keyGetter): Map<string, any[]> {
-	let map = Map.of();
-	list.forEach(item => {
-		const key = keyGetter(item);
-		const collection = map.get(key);
-		if (!collection) {
-			map = map.set(key, [item]);
-		} else {
-			collection.push(item);
-		}
-	});
-	return map;
-}
+export const groupByFunction = (keyExtractor: (obj: object | string) => string) => array =>
+	array.reduce((objectsByKeyValue, obj) => {
+		const value = keyExtractor(obj);
+		objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+		return objectsByKeyValue;
+	}, {});
 
 export const toCreationDate = (today: Date): string => {
 	return `${today
@@ -69,4 +61,4 @@ export const getCardFromCardId = (cardId: number | string, cards: AllCardsServic
 	return card;
 };
 
-export { partitionArray, http, sleep, groupBy };
+export { partitionArray, http, sleep };
