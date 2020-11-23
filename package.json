@@ -1,6 +1,6 @@
 {
-	"name": "trigger-build-duels-stats",
-	"version": "1.0.0",
+	"name": "@firestone-hs/duels-global-stats",
+	"version": "1.0.1",
 	"description": "",
 	"scripts": {
 		"lint": "eslint --color --fix --ext .ts .",
@@ -14,7 +14,12 @@
 	"repository": {},
 	"author": "",
 	"license": "MIT",
-	"private": true,
+	"private": false,
+	"main": "dist/build-duels-stats.js",
+	"types": "dist/build-duels-stats.d.ts",
+	"files": [
+		"dist/**/*"
+	],
 	"dependencies": {
 		"@firestone-hs/hs-replay-xml-parser": "0.0.55",
 		"@firestone-hs/reference-data": "^0.1.57",
