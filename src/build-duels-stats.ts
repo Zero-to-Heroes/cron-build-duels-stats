@@ -49,10 +49,10 @@ export default async (event): Promise<any> => {
 
 const buildStats = async (mysql, cards, gameMode) => {
 	const heroStats = await buildHeroStats(mysql, cards, gameMode);
-	const heroPowerStats = await buildHeroPowerStats(mysql, cards, gameMode);
-	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards, gameMode);
-	const treasureStats = await buildTreasureStats(mysql, cards, gameMode);
 	const heroPositionStats = await buildHeroPositionStats(mysql, cards, gameMode);
+	const heroPowerStats = await buildHeroPowerStats(mysql, cards, gameMode);
 	const heroPowerPositionStats = await buildHeroPowerPositionStats(mysql, cards, gameMode);
+	const signatureTreasureStats = await buildSignatureTreasureStats(mysql, cards, gameMode);
 	const signatureTreasurePositionStats = await buildSignatureTreasurePositionStats(mysql, cards, gameMode);
+	const treasureStats = await buildTreasureStats(mysql, cards, gameMode);
 };
