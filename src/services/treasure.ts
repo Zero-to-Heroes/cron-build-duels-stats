@@ -12,9 +12,9 @@ export const buildTreasureStats = async (
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
-	console.log('running last job query', lastJobQuery);
+	// console.log('running last job query', lastJobQuery);
 	const lastJobData: readonly any[] = await mysql.query(lastJobQuery);
-	console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
+	// console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
 
 	const startDate = lastJobData && lastJobData.length > 0 ? lastJobData[0].periodStart : null;
 	const startDateStatemenet = startDate ? `AND t1.creationDate >= '${formatDate(startDate)}' ` : '';
@@ -32,9 +32,9 @@ export const buildTreasureStats = async (
 		AND t1.bundleType = 'treasure'
 		ORDER BY t2.playerClass;
 	`;
-	console.log('running query', query);
+	// console.log('running query', query);
 	const results: readonly InternalTreasureRow[] = await mysql.query(query);
-	console.log('treasureResults', results);
+	// console.log('treasureResults', results);
 
 	if (!results || results.length === 0) {
 		console.log('no new treasure info');
@@ -92,7 +92,7 @@ export const buildTreasureStats = async (
 		(gameMode, periodStart, cardId, playerClass, totalOffered, totalPicked)
 		VALUES ${values}
 	`;
-	console.log('running query', insertionQuery);
+	// console.log('running query', insertionQuery);
 	await mysql.query(insertionQuery);
 	return stats;
 };

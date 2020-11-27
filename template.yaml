@@ -10,9 +10,9 @@ Resources:
         Properties:
             Handler: build-duels-stats.default
             Runtime: nodejs10.x
-            Timeout: 350
+            Timeout: 900
             CodeUri: ./dist/build-duels-stats
-            MemorySize: 128
+            MemorySize: 384
             # https://stackoverflow.com/questions/39144688/aws-lambda-invoke-not-calling-another-lambda-function-node-js
             # VpcConfig:
             #     SecurityGroupIds:

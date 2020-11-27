@@ -12,9 +12,9 @@ export const buildHeroPowerPositionStats = async (
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
-	console.log('running last job query', lastJobQuery);
+	// console.log('running last job query', lastJobQuery);
 	const lastJobData: readonly any[] = await mysql.query(lastJobQuery);
-	console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
+	// console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
 
 	const startDate = lastJobData && lastJobData.length > 0 ? lastJobData[0].periodStart : null;
 	const startDateStatemenet = startDate ? `AND t1.creationDate >= '${formatDate(startDate)}' ` : '';
@@ -25,8 +25,8 @@ export const buildHeroPowerPositionStats = async (
 	const allHeroPowersQuery = `
 		SELECT t2.option1 AS heroPower, SUBSTRING_INDEX(t1.additionalResult, '-', 1) AS wins, t1.result, COUNT(*) as count
 		FROM replay_summary t1
-		INNER JOIN match_stats t3 ON t3.reviewId = t1.reviewId
-		INNER JOIN dungeon_run_loot_info t2 ON t3.statValue = t2.runId
+		INNER JOIN replay_summary_secondary_data t3 ON t3.reviewId = t1.reviewId
+		INNER JOIN dungeon_run_loot_info t2 ON t3.duelsRunId = t2.runId
 		WHERE t1.gameMode = '${gameMode}' 
 		AND t1.playerCardId like 'PVPDR_Hero%'
 		AND (
@@ -35,10 +35,9 @@ export const buildHeroPowerPositionStats = async (
 		)
 		${startDateStatemenet}
 		AND t2.bundleType = 'hero-power'
-		AND t3.statName = 'duels-run-id'
 		GROUP BY heroPower, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
 	`;
-	console.log('running query', allHeroPowersQuery);
+	// console.log('running query', allHeroPowersQuery);
 	const allHeroPowersResult: readonly any[] = await mysql.query(allHeroPowersQuery);
 	// console.log('allHeroPowersResult', allHeroPowersResult);
 

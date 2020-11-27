@@ -9,6 +9,8 @@ export interface DuelsGlobalStats {
 export interface DuelsGlobalStatsForGameMode {
 	readonly statsForFullPeriod: DuelsGlobalStatsForPeriod;
 	readonly statsSinceLastPatch: DuelsGlobalStatsForPeriod;
+	readonly statsForThreeDays: DuelsGlobalStatsForPeriod;
+	readonly statsForSevenDays: DuelsGlobalStatsForPeriod;
 }
 
 export interface DuelsGlobalStatsForPeriod {
