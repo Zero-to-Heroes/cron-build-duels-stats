@@ -9,7 +9,7 @@ import {
 	SignatureTreasureStat,
 	TreasureStat,
 } from './stat';
-import { groupByFunction, http } from './utils/util-functions';
+import { formatDate, groupByFunction, http } from './utils/util-functions';
 
 const TREASURES_REMOVED_CARDS = [
 	CardIds.NonCollectible.Neutral.RobesOfGaudiness,
@@ -90,6 +90,7 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 		console.log('built stats for full period', statsSevenDaysBoth);
 
 		const result: DuelsGlobalStats = {
+			lastUpdateDate: formatDate(new Date()),
 			duels: {
 				statsForFullPeriod: statsForFullPeriodDuels,
 				statsSinceLastPatch: statsSinceLastPatchDuels,
@@ -148,21 +149,52 @@ const mergeTreasureStats = (periodStartDate: Date, stats: readonly TreasureStat[
 	return uniqueCardIds
 		.map(treasureCardId => {
 			const relevant: readonly TreasureStat[] = stats.filter(stat => stat.cardId === treasureCardId);
+			// if (treasureCardId === 'FP1_006') {
+			// 	console.debug('relevant', relevant);
+			// }
 			const uniquePlayerClasses: readonly string[] = [...new Set(relevant.map(stat => stat.playerClass))];
+			// if (treasureCardId === 'FP1_006') {
+			// 	console.debug('uniquePlayerClasses', uniquePlayerClasses);
+			// }
 			return uniquePlayerClasses.map(playerClass => {
 				const relevantForClass: readonly TreasureStat[] = relevant.filter(
 					stat => stat.playerClass === playerClass,
 				);
+				// if (treasureCardId === 'FP1_006') {
+				// 	console.debug(
+				// 		'relevantForClass',
+				// 		relevantForClass,
+				// 		relevantForClass.map(stat => stat.matchesPlayed).reduce((a, b) => a + b, 0),
+				// 	);
+				// }
 				return {
 					periodStart: periodStartDate.toISOString(),
 					cardId: treasureCardId,
 					playerClass: relevantForClass[0].playerClass,
-					matchesPlayed: relevantForClass.map(stat => stat.matchesPlayed).reduce((a, b) => a + b, 0),
-					totalLosses: relevantForClass.map(stat => stat.totalLosses).reduce((a, b) => a + b, 0),
-					totalOffered: relevantForClass.map(stat => stat.totalOffered).reduce((a, b) => a + b, 0),
-					totalPicked: relevantForClass.map(stat => stat.totalPicked).reduce((a, b) => a + b, 0),
-					totalTies: relevantForClass.map(stat => stat.totalTies).reduce((a, b) => a + b, 0),
-					totalWins: relevantForClass.map(stat => stat.totalWins).reduce((a, b) => a + b, 0),
+					matchesPlayed: relevantForClass
+						.map(stat => stat.matchesPlayed)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
+					totalLosses: relevantForClass
+						.map(stat => stat.totalLosses)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
+					totalOffered: relevantForClass
+						.map(stat => stat.totalOffered)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
+					totalPicked: relevantForClass
+						.map(stat => stat.totalPicked)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
+					totalTies: relevantForClass
+						.map(stat => stat.totalTies)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
+					totalWins: relevantForClass
+						.map(stat => stat.totalWins)
+						.filter(value => value != null)
+						.reduce((a, b) => a + b, 0),
 				};
 			});
 		})
