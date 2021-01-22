@@ -27,10 +27,10 @@ export default async (event): Promise<any> => {
 	await buildStats(mysql, cards, 'paid-duels');
 	console.log('new stats inserted in db');
 
-	// TODO: load stats, and save as JSON
 	const stats = await loadStats(mysql);
 	console.log('built stats to cache');
 	await mysql.end();
+
 	const stringResults = JSON.stringify(stats);
 	console.log('stringified results');
 	const gzippedResults = gzipSync(stringResults);
