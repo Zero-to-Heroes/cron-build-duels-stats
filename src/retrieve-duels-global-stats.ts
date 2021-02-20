@@ -14,6 +14,7 @@ import { formatDate, groupByFunction, http } from './utils/util-functions';
 const TREASURES_REMOVED_CARDS = [
 	CardIds.NonCollectible.Neutral.RobesOfGaudiness,
 	CardIds.NonCollectible.Neutral.HeadmasterKelThuzad_MrBigglesworthToken,
+	CardIds.NonCollectible.Neutral.GattlingGunner,
 ];
 
 export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {

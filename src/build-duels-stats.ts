@@ -48,6 +48,7 @@ export default async (event): Promise<any> => {
 };
 
 const buildStats = async (mysql, cards, gameMode) => {
+	// TODO: filter out stats that have too few datapoints
 	const heroStats = await buildHeroStats(mysql, cards, gameMode);
 	const heroPositionStats = await buildHeroPositionStats(mysql, cards, gameMode);
 	const heroPowerStats = await buildHeroPowerStats(mysql, cards, gameMode);
