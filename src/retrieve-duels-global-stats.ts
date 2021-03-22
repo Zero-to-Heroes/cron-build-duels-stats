@@ -333,9 +333,12 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	// console.log('running query', pickQuery);
+	console.log('running query', pickQuery);
 	const pickResults: any[] = await mysql.query(pickQuery);
-	// console.log('pickResults', pickResults);
+	console.debug(
+		'pickResults',
+		pickResults.filter(res => res.cardId === 'ULDA_043'),
+	);
 
 	const winrateQuery = `
 		SELECT '${periodStart.toISOString()}' as periodStart, cardId, playerClass, SUM(matchesPlayed) as matchesPlayed, SUM(totalLosses) as totalLosses, SUM(totalTies) as totalTies, SUM(totalWins) as totalWins
@@ -344,23 +347,29 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	// console.log('running query', winrateQuery);
+	console.log('running query', winrateQuery);
 	const winrateResults: any[] = await mysql.query(winrateQuery);
-	// console.log('winrateResults', winrateResults);
+	console.debug(
+		'winrateResults',
+		winrateResults.filter(res => res.cardId === 'ULDA_043'),
+	);
 
 	const result = pickResults
-		.filter(result => !TREASURES_REMOVED_CARDS.includes(result.cardId)) // Robes of Gaudiness
+		.filter(result => !TREASURES_REMOVED_CARDS.includes(result.cardId))
 		.map(result => {
-			const winrateResult = winrateResults.find(
-				res => res.cardId === result.cardId && res.playerClass === result.playerClass,
-			);
+			const winrateResult =
+				winrateResults.find(res => res.cardId === result.cardId && res.playerClass === result.playerClass) ??
+				{};
 			// console.log('mapping', result, winrateResult);
 			return {
 				...result,
 				...winrateResult,
 			} as TreasureStat;
 		});
-	// console.log('treasureResults', result);
+	console.debug(
+		'result',
+		result.filter(res => res.cardId === 'ULDA_043'),
+	);
 	return result;
 };
 
