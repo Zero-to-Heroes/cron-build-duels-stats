@@ -13,9 +13,9 @@ export const buildSignatureTreasureStats = async (
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
-	console.log('running last job query', lastJobQuery);
+	// console.log('running last job query', lastJobQuery);
 	const lastJobData: readonly any[] = await mysql.query(lastJobQuery);
-	console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
+	// console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
 
 	const startDate = lastJobData && lastJobData.length > 0 ? lastJobData[0].periodStart : null;
 	const startDateStatemenet = startDate ? `AND t1.creationDate >= '${formatDate(startDate)}' ` : '';
@@ -34,9 +34,9 @@ export const buildSignatureTreasureStats = async (
 		AND t2.bundleType = 'signature-treasure'
 		GROUP BY signatureTreasure, t1.playerClass;
 	`;
-	console.log('running query', allSignatureTreasuresQuery);
+	// console.log('running query', allSignatureTreasuresQuery);
 	const allSignatureTreasuresResult: readonly any[] = await mysql.query(allSignatureTreasuresQuery);
-	console.log('allSignatureTreasuresResult', allSignatureTreasuresResult?.length);
+	// console.log('allSignatureTreasuresResult', allSignatureTreasuresResult?.length);
 
 	if (!allSignatureTreasuresResult || allSignatureTreasuresResult.length === 0) {
 		console.log('no new signature treasure info');
@@ -55,9 +55,9 @@ export const buildSignatureTreasureStats = async (
 		AND t2.bundleType = 'signature-treasure'
 		GROUP BY signatureTreasure, t1.playerClass;
 	`;
-	console.log('running query', allSignatureTreasuresWonQuery);
+	// console.log('running query', allSignatureTreasuresWonQuery);
 	const allSignatureTreasuresWonResult: readonly any[] = await mysql.query(allSignatureTreasuresWonQuery);
-	console.log('allSignatureTreasuresWonResult', allSignatureTreasuresWonResult);
+	// console.log('allSignatureTreasuresWonResult', allSignatureTreasuresWonResult);
 
 	// const totalGames = allSignatureTreasuresResult.map(result => result.count).reduce((a, b) => a + b, 0);
 	const stats = allSignatureTreasuresResult

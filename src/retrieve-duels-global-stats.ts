@@ -32,11 +32,15 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 			mysql,
 			'paid-duels',
 		);
-		const statsForFullPeriodBoth: DuelsGlobalStatsForPeriod = merge(
-			fullPeriodStartDate,
-			...[statsForFullPeriodDuels, statsForFullPeriodPaidDuels],
+		const statsForFullPeriodBoth: DuelsGlobalStatsForPeriod = merge(fullPeriodStartDate, [
+			statsForFullPeriodDuels,
+			statsForFullPeriodPaidDuels,
+		]);
+		console.log(
+			'built stats for full period',
+			statsForFullPeriodBoth.deckStats.length,
+			statsForFullPeriodBoth.deckStats,
 		);
-		console.log('built stats for full period', statsForFullPeriodBoth);
 
 		// Start the day after, the limit the occurences of old versions being included
 		const lastPatchStartDate = new Date(new Date(lastPatch.date).getTime() + 24 * 60 * 60 * 1000);
@@ -50,11 +54,11 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 			mysql,
 			'paid-duels',
 		);
-		const statsSinceLastPatchBoth: DuelsGlobalStatsForPeriod = merge(
-			lastPatchStartDate,
-			...[statsSinceLastPatchDuels, statsSinceLastPatchPaidDuels],
-		);
-		console.log('built stats for full period', statsSinceLastPatchBoth);
+		const statsSinceLastPatchBoth: DuelsGlobalStatsForPeriod = merge(lastPatchStartDate, [
+			statsSinceLastPatchDuels,
+			statsSinceLastPatchPaidDuels,
+		]);
+		// console.log('built stats for full period', statsSinceLastPatchBoth);
 
 		const lastThreeDaysStartDate = new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000);
 		const statsForThreeDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
@@ -67,11 +71,11 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 			mysql,
 			'paid-duels',
 		);
-		const statsThreeDaysBoth: DuelsGlobalStatsForPeriod = merge(
-			lastThreeDaysStartDate,
-			...[statsForThreeDaysDuels, statsForThreeDaysPaidDuels],
-		);
-		console.log('built stats for full period', statsThreeDaysBoth);
+		const statsThreeDaysBoth: DuelsGlobalStatsForPeriod = merge(lastThreeDaysStartDate, [
+			statsForThreeDaysDuels,
+			statsForThreeDaysPaidDuels,
+		]);
+		// console.log('built stats for full period', statsThreeDaysBoth);
 
 		const lastSevenDaysStartDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
 		const statsForSevenDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
@@ -84,11 +88,11 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 			mysql,
 			'paid-duels',
 		);
-		const statsSevenDaysBoth: DuelsGlobalStatsForPeriod = merge(
-			lastSevenDaysStartDate,
-			...[statsForSevenDaysDuels, statsForSevenDaysPaidDuels],
-		);
-		console.log('built stats for full period', statsSevenDaysBoth);
+		const statsSevenDaysBoth: DuelsGlobalStatsForPeriod = merge(lastSevenDaysStartDate, [
+			statsForSevenDaysDuels,
+			statsForSevenDaysPaidDuels,
+		]);
+		// console.log('built stats for full period', statsSevenDaysBoth);
 
 		const result: DuelsGlobalStats = {
 			lastUpdateDate: formatDate(new Date()),
@@ -117,7 +121,7 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 	}
 };
 
-const merge = (periodStartDate: Date, ...stats: readonly DuelsGlobalStatsForPeriod[]): DuelsGlobalStatsForPeriod => {
+const merge = (periodStartDate: Date, stats: readonly DuelsGlobalStatsForPeriod[]): DuelsGlobalStatsForPeriod => {
 	const heroStats = mergeHeroStats(
 		periodStartDate,
 		stats.map(stat => stat.heroStats).reduce((a, b) => a.concat(b), []),
@@ -133,6 +137,11 @@ const merge = (periodStartDate: Date, ...stats: readonly DuelsGlobalStatsForPeri
 	const treasureStats = mergeTreasureStats(
 		periodStartDate,
 		stats.map(stat => stat.treasureStats).reduce((a, b) => a.concat(b), []),
+	);
+	console.log(
+		'merging deck stats',
+		stats.map(stat => stat.deckStats),
+		stats,
 	);
 	const deckStats = stats.map(stat => stat.deckStats).reduce((a, b) => a.concat(b), []);
 
@@ -307,9 +316,9 @@ const loadDeckStats = async (
 		ORDER BY id desc
 		LIMIT 100;
 	`;
-	// console.log('running query', query);
+	console.log('running query', query);
 	const dbResults: any[] = await mysql.query(query);
-	// console.log('dbResults', dbResults);
+	console.log('dbResults', dbResults.length, dbResults);
 
 	return dbResults.map(
 		result =>
@@ -333,12 +342,12 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	console.log('running query', pickQuery);
+	// console.log('running query', pickQuery);
 	const pickResults: any[] = await mysql.query(pickQuery);
-	console.debug(
-		'pickResults',
-		pickResults.filter(res => res.cardId === 'ULDA_043'),
-	);
+	// console.debug(
+	// 	'pickResults',
+	// 	pickResults.filter(res => res.cardId === 'ULDA_043'),
+	// );
 
 	const winrateQuery = `
 		SELECT '${periodStart.toISOString()}' as periodStart, cardId, playerClass, SUM(matchesPlayed) as matchesPlayed, SUM(totalLosses) as totalLosses, SUM(totalTies) as totalTies, SUM(totalWins) as totalWins
@@ -347,12 +356,12 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	console.log('running query', winrateQuery);
+	// console.log('running query', winrateQuery);
 	const winrateResults: any[] = await mysql.query(winrateQuery);
-	console.debug(
-		'winrateResults',
-		winrateResults.filter(res => res.cardId === 'ULDA_043'),
-	);
+	// console.debug(
+	// 	'winrateResults',
+	// 	winrateResults.filter(res => res.cardId === 'ULDA_043'),
+	// );
 
 	const result = pickResults
 		.filter(result => !TREASURES_REMOVED_CARDS.includes(result.cardId))
@@ -366,10 +375,10 @@ const loadTreasureStats = async (
 				...winrateResult,
 			} as TreasureStat;
 		});
-	console.debug(
-		'result',
-		result.filter(res => res.cardId === 'ULDA_043'),
-	);
+	// console.debug(
+	// 	'result',
+	// 	result.filter(res => res.cardId === 'ULDA_043'),
+	// );
 	return result;
 };
 
