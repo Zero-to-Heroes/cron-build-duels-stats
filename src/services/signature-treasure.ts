@@ -69,8 +69,11 @@ export const buildSignatureTreasureStats = async (
 					heroClass: result.playerClass,
 					totalMatches: result.count,
 					totalWins:
-						allSignatureTreasuresWonResult.find(hero => hero.signatureTreasure === result.signatureTreasure)
-							?.count || 0,
+						allSignatureTreasuresWonResult.find(
+							hero =>
+								hero.signatureTreasure === result.signatureTreasure &&
+								hero.playerClass === result.playerClass,
+						)?.count || 0,
 				} as SignatureTreasureStat),
 		)
 		.filter(result => {
