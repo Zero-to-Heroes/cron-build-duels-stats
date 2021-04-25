@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { CardIds } from '@firestone-hs/reference-data';
+import { AllCardsService, CardIds } from '@firestone-hs/reference-data';
 import {
 	DeckStat,
 	DuelsGlobalStats,
@@ -17,8 +17,11 @@ const TREASURES_REMOVED_CARDS = [
 	CardIds.NonCollectible.Neutral.GattlingGunner,
 ];
 
+const allCards = new AllCardsService();
+
 export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 	try {
+		await allCards.initializeCardsDb();
 		const [lastPatch] = await Promise.all([getLastPatch()]);
 
 		const fullPeriodStartDate = new Date(new Date().getTime() - 100 * 24 * 60 * 60 * 1000);
@@ -133,6 +136,7 @@ const merge = (periodStartDate: Date, stats: readonly DuelsGlobalStatsForPeriod[
 	const signatureTreasureStats = mergeSignatureTreasureStats(
 		periodStartDate,
 		stats.map(stat => stat.signatureTreasureStats).reduce((a, b) => a.concat(b), []),
+		allCards,
 	);
 	const treasureStats = mergeTreasureStats(
 		periodStartDate,
@@ -214,26 +218,43 @@ const mergeTreasureStats = (periodStartDate: Date, stats: readonly TreasureStat[
 const mergeSignatureTreasureStats = (
 	periodStartDate: Date,
 	stats: readonly SignatureTreasureStat[],
+	allCards: AllCardsService,
 ): readonly SignatureTreasureStat[] => {
 	const uniqueHeroCardIds = [...new Set(stats.map(stat => stat.signatureTreasureCardId))];
-	return uniqueHeroCardIds.map(signatureTreasureCardId => {
-		const relevant: readonly SignatureTreasureStat[] = stats.filter(
-			stat => stat.signatureTreasureCardId === signatureTreasureCardId,
-		);
-		const winsDistribution: { [winNumber: string]: number } = {};
-		for (let i = 0; i <= 12; i++) {
-			winsDistribution[i] = relevant.map(stat => stat.winDistribution[i]).reduce((a, b) => a + b, 0);
-		}
-		return {
-			periodStart: periodStartDate.toISOString(),
-			creationDate: periodStartDate.toISOString(),
-			signatureTreasureCardId: signatureTreasureCardId,
-			heroClass: relevant[0]?.heroClass,
-			totalMatches: relevant.map(stat => stat.totalMatches).reduce((a, b) => a + b, 0),
-			totalWins: relevant.map(stat => stat.totalWins).reduce((a, b) => a + b, 0),
-			winDistribution: winsDistribution,
-		};
-	});
+	return uniqueHeroCardIds
+		.map(signatureTreasureCardId => {
+			const refCard = allCards.getCard(signatureTreasureCardId);
+			if (!refCard) {
+				return [null];
+			}
+			const classes = refCard.classes?.length ? refCard.classes : [refCard.playerClass];
+			return classes.map(playerClass => ({
+				playerClass: playerClass,
+				signatureTreasureCardId: signatureTreasureCardId,
+			}));
+		})
+		.reduce((a, b) => a.concat(b), [])
+		.filter(info => info)
+		.map(info => {
+			const relevant: readonly SignatureTreasureStat[] = stats.filter(
+				stat =>
+					stat.signatureTreasureCardId === info.signatureTreasureCardId &&
+					stat.heroClass?.toLowerCase() === info.playerClass?.toLowerCase(),
+			);
+			const winsDistribution: { [winNumber: string]: number } = {};
+			for (let i = 0; i <= 12; i++) {
+				winsDistribution[i] = relevant.map(stat => stat.winDistribution[i]).reduce((a, b) => a + b, 0);
+			}
+			return {
+				periodStart: periodStartDate.toISOString(),
+				creationDate: periodStartDate.toISOString(),
+				signatureTreasureCardId: info.signatureTreasureCardId,
+				heroClass: relevant[0]?.heroClass,
+				totalMatches: relevant.map(stat => stat.totalMatches).reduce((a, b) => a + b, 0),
+				totalWins: relevant.map(stat => stat.totalWins).reduce((a, b) => a + b, 0),
+				winDistribution: winsDistribution,
+			};
+		});
 };
 
 const mergeHeroStats = (periodStartDate: Date, stats: readonly HeroStat[]): readonly HeroStat[] => {
@@ -499,7 +520,9 @@ const loadSignatureTreasureStats = async (
 
 	return dbResults.map(result => {
 		const winsForHero = dbPositionResults.filter(
-			res => res.signatureTreasureCardId === result.signatureTreasureCardId,
+			res =>
+				res.signatureTreasureCardId === result.signatureTreasureCardId &&
+				res.heroClass?.toLowerCase() === result.heroClass?.toLowerCase(),
 		);
 		const groupedByWins: { [winNumber: string]: any[] } = groupByFunction((res: any) => res.totalWins)(winsForHero);
 		const winsDistribution: { [winNumber: string]: number } = {};

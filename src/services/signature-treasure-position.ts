@@ -23,7 +23,7 @@ export const buildSignatureTreasurePositionStats = async (
 	const periodDate = formatDate(endDate);
 
 	const allHeroesQuery = `
-		SELECT t2.option1 as signatureTreasure, SUBSTRING_INDEX(t1.additionalResult, '-', 1) AS wins, t1.result, COUNT(*) as count
+		SELECT t2.option1 as signatureTreasure, t1.playerClass, SUBSTRING_INDEX(t1.additionalResult, '-', 1) AS wins, t1.result, COUNT(*) as count
 		FROM replay_summary t1
 		INNER JOIN replay_summary_secondary_data t3 ON t3.reviewId = t1.reviewId
 		INNER JOIN dungeon_run_loot_info t2 ON t3.duelsRunId = t2.runId
@@ -35,7 +35,7 @@ export const buildSignatureTreasurePositionStats = async (
 		)
 		${startDateStatemenet}
 		AND t2.bundleType = 'signature-treasure'
-		GROUP BY signatureTreasure, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
+		GROUP BY signatureTreasure, t1.playerClass, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
 	`;
 	// console.log('running query', allHeroesQuery);
 	const allHeroesResult: readonly any[] = await mysql.query(allHeroesQuery);
@@ -51,7 +51,7 @@ export const buildSignatureTreasurePositionStats = async (
 			({
 				periodStart: periodDate,
 				signatureTreasureCardId: getCardFromCardId(result.signatureTreasure, cards)?.id,
-				heroClass: getCardFromCardId(result.signatureTreasure, cards)?.playerClass,
+				heroClass: result.playerClass?.toLowerCase(),
 				totalMatches: result.count,
 				totalWins: result.result === 'won' ? +result.wins + 1 : +result.wins,
 			} as SignatureTreasureStat),
