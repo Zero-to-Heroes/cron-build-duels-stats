@@ -20,108 +20,104 @@ const TREASURES_REMOVED_CARDS = [
 const allCards = new AllCardsService();
 
 export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
-	try {
-		await allCards.initializeCardsDb();
-		const [lastPatch] = await Promise.all([getLastPatch()]);
+	await allCards.initializeCardsDb();
+	const [lastPatch] = await Promise.all([getLastPatch()]);
 
-		const fullPeriodStartDate = new Date(new Date().getTime() - 100 * 24 * 60 * 60 * 1000);
-		const statsForFullPeriodDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			fullPeriodStartDate,
-			mysql,
-			'duels',
-		);
-		const statsForFullPeriodPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			fullPeriodStartDate,
-			mysql,
-			'paid-duels',
-		);
-		const statsForFullPeriodBoth: DuelsGlobalStatsForPeriod = merge(fullPeriodStartDate, [
-			statsForFullPeriodDuels,
-			statsForFullPeriodPaidDuels,
-		]);
-		console.log(
-			'built stats for full period',
-			statsForFullPeriodBoth.deckStats.length,
-			statsForFullPeriodBoth.deckStats,
-		);
+	const fullPeriodStartDate = new Date(new Date().getTime() - 100 * 24 * 60 * 60 * 1000);
+	const statsForFullPeriodDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		fullPeriodStartDate,
+		mysql,
+		'duels',
+	);
+	const statsForFullPeriodPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		fullPeriodStartDate,
+		mysql,
+		'paid-duels',
+	);
+	const statsForFullPeriodBoth: DuelsGlobalStatsForPeriod = merge(fullPeriodStartDate, [
+		statsForFullPeriodDuels,
+		statsForFullPeriodPaidDuels,
+	]);
+	console.log(
+		'built stats for full period',
+		statsForFullPeriodBoth.deckStats.length,
+		statsForFullPeriodBoth.deckStats,
+	);
 
-		// Start the day after, the limit the occurences of old versions being included
-		const lastPatchStartDate = new Date(new Date(lastPatch.date).getTime() + 24 * 60 * 60 * 1000);
-		const statsSinceLastPatchDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastPatchStartDate,
-			mysql,
-			'duels',
-		);
-		const statsSinceLastPatchPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastPatchStartDate,
-			mysql,
-			'paid-duels',
-		);
-		const statsSinceLastPatchBoth: DuelsGlobalStatsForPeriod = merge(lastPatchStartDate, [
-			statsSinceLastPatchDuels,
-			statsSinceLastPatchPaidDuels,
-		]);
-		// console.log('built stats for full period', statsSinceLastPatchBoth);
+	// Start the day after, the limit the occurences of old versions being included
+	const lastPatchStartDate = new Date(new Date(lastPatch.date).getTime() + 24 * 60 * 60 * 1000);
+	const statsSinceLastPatchDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastPatchStartDate,
+		mysql,
+		'duels',
+	);
+	const statsSinceLastPatchPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastPatchStartDate,
+		mysql,
+		'paid-duels',
+	);
+	const statsSinceLastPatchBoth: DuelsGlobalStatsForPeriod = merge(lastPatchStartDate, [
+		statsSinceLastPatchDuels,
+		statsSinceLastPatchPaidDuels,
+	]);
+	// console.log('built stats for full period', statsSinceLastPatchBoth);
 
-		const lastThreeDaysStartDate = new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000);
-		const statsForThreeDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastThreeDaysStartDate,
-			mysql,
-			'duels',
-		);
-		const statsForThreeDaysPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastThreeDaysStartDate,
-			mysql,
-			'paid-duels',
-		);
-		const statsThreeDaysBoth: DuelsGlobalStatsForPeriod = merge(lastThreeDaysStartDate, [
-			statsForThreeDaysDuels,
-			statsForThreeDaysPaidDuels,
-		]);
-		// console.log('built stats for full period', statsThreeDaysBoth);
+	const lastThreeDaysStartDate = new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000);
+	const statsForThreeDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastThreeDaysStartDate,
+		mysql,
+		'duels',
+	);
+	const statsForThreeDaysPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastThreeDaysStartDate,
+		mysql,
+		'paid-duels',
+	);
+	const statsThreeDaysBoth: DuelsGlobalStatsForPeriod = merge(lastThreeDaysStartDate, [
+		statsForThreeDaysDuels,
+		statsForThreeDaysPaidDuels,
+	]);
+	// console.log('built stats for full period', statsThreeDaysBoth);
 
-		const lastSevenDaysStartDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-		const statsForSevenDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastSevenDaysStartDate,
-			mysql,
-			'duels',
-		);
-		const statsForSevenDaysPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
-			lastSevenDaysStartDate,
-			mysql,
-			'paid-duels',
-		);
-		const statsSevenDaysBoth: DuelsGlobalStatsForPeriod = merge(lastSevenDaysStartDate, [
-			statsForSevenDaysDuels,
-			statsForSevenDaysPaidDuels,
-		]);
-		// console.log('built stats for full period', statsSevenDaysBoth);
+	const lastSevenDaysStartDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
+	const statsForSevenDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastSevenDaysStartDate,
+		mysql,
+		'duels',
+	);
+	const statsForSevenDaysPaidDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
+		lastSevenDaysStartDate,
+		mysql,
+		'paid-duels',
+	);
+	const statsSevenDaysBoth: DuelsGlobalStatsForPeriod = merge(lastSevenDaysStartDate, [
+		statsForSevenDaysDuels,
+		statsForSevenDaysPaidDuels,
+	]);
+	// console.log('built stats for full period', statsSevenDaysBoth);
 
-		const result: DuelsGlobalStats = {
-			lastUpdateDate: formatDate(new Date()),
-			duels: {
-				statsForFullPeriod: statsForFullPeriodDuels,
-				statsSinceLastPatch: statsSinceLastPatchDuels,
-				statsForThreeDays: statsForThreeDaysDuels,
-				statsForSevenDays: statsForSevenDaysDuels,
-			},
-			paidDuels: {
-				statsForFullPeriod: statsForFullPeriodPaidDuels,
-				statsSinceLastPatch: statsSinceLastPatchPaidDuels,
-				statsForThreeDays: statsForThreeDaysPaidDuels,
-				statsForSevenDays: statsForSevenDaysPaidDuels,
-			},
-			both: {
-				statsForFullPeriod: statsForFullPeriodBoth,
-				statsSinceLastPatch: statsSinceLastPatchBoth,
-				statsForThreeDays: statsThreeDaysBoth,
-				statsForSevenDays: statsSevenDaysBoth,
-			},
-		};
-		return result;
-	} catch (e) {
-		return null;
-	}
+	const result: DuelsGlobalStats = {
+		lastUpdateDate: formatDate(new Date()),
+		duels: {
+			statsForFullPeriod: statsForFullPeriodDuels,
+			statsSinceLastPatch: statsSinceLastPatchDuels,
+			statsForThreeDays: statsForThreeDaysDuels,
+			statsForSevenDays: statsForSevenDaysDuels,
+		},
+		paidDuels: {
+			statsForFullPeriod: statsForFullPeriodPaidDuels,
+			statsSinceLastPatch: statsSinceLastPatchPaidDuels,
+			statsForThreeDays: statsForThreeDaysPaidDuels,
+			statsForSevenDays: statsForSevenDaysPaidDuels,
+		},
+		both: {
+			statsForFullPeriod: statsForFullPeriodBoth,
+			statsSinceLastPatch: statsSinceLastPatchBoth,
+			statsForThreeDays: statsThreeDaysBoth,
+			statsForSevenDays: statsSevenDaysBoth,
+		},
+	};
+	return result;
 };
 
 const merge = (periodStartDate: Date, stats: readonly DuelsGlobalStatsForPeriod[]): DuelsGlobalStatsForPeriod => {
