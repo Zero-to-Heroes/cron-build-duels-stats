@@ -8,9 +8,7 @@ export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-due
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
-	// console.log('running last job query', lastJobQuery);
 	const lastJobData: readonly any[] = await mysql.query(lastJobQuery);
-	// console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
 
 	const startDate = lastJobData && lastJobData.length > 0 ? lastJobData[0].periodStart : null;
 	const startDateStatemenet = startDate ? `AND creationDate >= '${formatDate(startDate)}' ` : '';
@@ -25,12 +23,9 @@ export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-due
 		${startDateStatemenet}
 		GROUP BY playerCardId;
 	`;
-	// console.log('running query', allHeroesQuery);
 	const allHeroesResult: readonly any[] = await mysql.query(allHeroesQuery);
-	// console.log('allHeroesResult', allHeroesResult);
 
 	if (!allHeroesResult || allHeroesResult.length === 0) {
-		console.log('no new hero info');
 		return;
 	}
 
@@ -42,9 +37,7 @@ export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-due
 		${startDateStatemenet}
 		GROUP BY playerCardId;
 	`;
-	// console.log('running query', allHeroesWonQuery);
 	const allHeroesWonResult: readonly any[] = await mysql.query(allHeroesWonQuery);
-	// console.log('allHeroesWonResult', allHeroesWonResult);
 
 	// const totalGames = allHeroesResult.map(result => result.count).reduce((a, b) => a + b, 0);
 	const stats = allHeroesResult.map(
@@ -67,7 +60,6 @@ export const buildHeroStats = async (mysql, cards, gameMode: 'duels' | 'paid-due
 		INSERT INTO duels_stats_hero (gameMode, periodStart, heroCardId, heroClass, totalMatches, totalWins)
 		VALUES ${values}
 	`;
-	// console.log('running query', query);
 	await mysql.query(query);
 	return stats;
 };

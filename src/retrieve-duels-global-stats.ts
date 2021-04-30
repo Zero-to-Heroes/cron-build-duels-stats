@@ -60,7 +60,6 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 		statsSinceLastPatchDuels,
 		statsSinceLastPatchPaidDuels,
 	]);
-	// console.log('built stats for full period', statsSinceLastPatchBoth);
 
 	const lastThreeDaysStartDate = new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000);
 	const statsForThreeDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
@@ -77,7 +76,6 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 		statsForThreeDaysDuels,
 		statsForThreeDaysPaidDuels,
 	]);
-	// console.log('built stats for full period', statsThreeDaysBoth);
 
 	const lastSevenDaysStartDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
 	const statsForSevenDaysDuels: DuelsGlobalStatsForPeriod = await loadStatsForPeriod(
@@ -94,7 +92,6 @@ export const loadStats = async (mysql): Promise<DuelsGlobalStats> => {
 		statsForSevenDaysDuels,
 		statsForSevenDaysPaidDuels,
 	]);
-	// console.log('built stats for full period', statsSevenDaysBoth);
 
 	const result: DuelsGlobalStats = {
 		lastUpdateDate: formatDate(new Date()),
@@ -254,17 +251,13 @@ const mergeSignatureTreasureStats = (
 };
 
 const mergeHeroStats = (periodStartDate: Date, stats: readonly HeroStat[]): readonly HeroStat[] => {
-	// console.log('merging', stats);
 	const uniqueHeroCardIds = [...new Set(stats.map(stat => stat.heroCardId))];
-	// console.log('uniqueHeroCardIds', uniqueHeroCardIds, stats);
 	return uniqueHeroCardIds.map(heroCardId => {
 		const relevant: readonly HeroStat[] = stats.filter(stat => stat.heroCardId === heroCardId);
-		// console.log('relevant', relevant, heroCardId);
 		const winsDistribution: { [winNumber: string]: number } = {};
 		for (let i = 0; i <= 12; i++) {
 			winsDistribution[i] = relevant.map(stat => stat.winDistribution[i]).reduce((a, b) => a + b, 0);
 		}
-		// console.log('win distribution', winsDistribution);
 		return {
 			periodStart: periodStartDate.toISOString(),
 			creationDate: periodStartDate.toISOString(),
@@ -333,9 +326,7 @@ const loadDeckStats = async (
 		ORDER BY id desc
 		LIMIT 100;
 	`;
-	console.log('running query', query);
 	const dbResults: any[] = await mysql.query(query);
-	console.log('dbResults', dbResults.length, dbResults);
 
 	return dbResults.map(
 		result =>
@@ -359,7 +350,6 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	// console.log('running query', pickQuery);
 	const pickResults: any[] = await mysql.query(pickQuery);
 	// console.debug(
 	// 	'pickResults',
@@ -373,7 +363,6 @@ const loadTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY cardId, playerClass;
 	`;
-	// console.log('running query', winrateQuery);
 	const winrateResults: any[] = await mysql.query(winrateQuery);
 	// console.debug(
 	// 	'winrateResults',
@@ -386,7 +375,6 @@ const loadTreasureStats = async (
 			const winrateResult =
 				winrateResults.find(res => res.cardId === result.cardId && res.playerClass === result.playerClass) ??
 				{};
-			// console.log('mapping', result, winrateResult);
 			return {
 				...result,
 				...winrateResult,
@@ -411,9 +399,7 @@ const loadHeroStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY heroCardId, heroClass;
 	`;
-	// console.log('running query', query);
 	const dbResults: any[] = await mysql.query(query);
-	// console.log('dbResults', dbResults);
 
 	const positionQuery = `
 		SELECT heroCardId, heroClass, totalWins, SUM(totalMatches) as totalMatches
@@ -422,9 +408,7 @@ const loadHeroStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY heroCardId, heroClass, totalWins
 	`;
-	// console.log('running query', positionQuery);
 	const dbPositionResults: any[] = await mysql.query(positionQuery);
-	// console.log('dbResults', dbPositionResults);
 
 	return dbResults.map(result => {
 		const winsForHero = dbPositionResults.filter(res => res.heroCardId === result.heroCardId);
@@ -455,9 +439,7 @@ const loadHeroPowerStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY heroPowerCardId, heroClass;
 	`;
-	// console.log('running query', query);
 	const dbResults: any[] = await mysql.query(query);
-	// console.log('dbResults', dbResults);
 
 	const positionQuery = `
 		SELECT heroPowerCardId, heroClass, totalWins, SUM(totalMatches) as totalMatches
@@ -466,9 +448,7 @@ const loadHeroPowerStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY heroPowerCardId, heroClass, totalWins
 	`;
-	// console.log('running query', positionQuery);
 	const dbPositionResults: any[] = await mysql.query(positionQuery);
-	// console.log('dbResults', dbPositionResults);
 
 	return dbResults.map(result => {
 		const winsForHero = dbPositionResults.filter(res => res.heroPowerCardId === result.heroPowerCardId);
@@ -499,9 +479,7 @@ const loadSignatureTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY signatureTreasureCardId, heroClass;
 	`;
-	// console.log('running query', query);
 	const dbResults: any[] = await mysql.query(query);
-	// console.log('dbResults', dbResults);
 
 	const positionQuery = `
 		SELECT signatureTreasureCardId, heroClass, totalWins, SUM(totalMatches) as totalMatches
@@ -510,9 +488,7 @@ const loadSignatureTreasureStats = async (
 		AND gameMode = '${gameMode}'
 		GROUP BY signatureTreasureCardId, heroClass, totalWins
 	`;
-	// console.log('running query', positionQuery);
 	const dbPositionResults: any[] = await mysql.query(positionQuery);
-	// console.log('dbResults', dbPositionResults);
 
 	return dbResults.map(result => {
 		const winsForHero = dbPositionResults.filter(
@@ -539,6 +515,5 @@ export const getLastPatch = async (): Promise<any> => {
 	const patchInfo = await http(`https://static.zerotoheroes.com/hearthstone/data/patches.json?v=2`);
 	const structuredPatch = JSON.parse(patchInfo);
 	const patchNumber = structuredPatch.currentDuelsMetaPatch;
-	// console.log('retrieved patch info', structuredPatch, patchNumber);
 	return structuredPatch.patches.find(patch => patch.number === patchNumber);
 };

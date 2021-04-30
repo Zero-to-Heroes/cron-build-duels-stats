@@ -12,9 +12,7 @@ export const buildSignatureTreasurePositionStats = async (
 		ORDER BY periodStart DESC
 		LIMIT 1
 	`;
-	// console.log('running last job query', lastJobQuery);
 	const lastJobData: readonly any[] = await mysql.query(lastJobQuery);
-	// console.log('lastJobData', lastJobData && lastJobData.length > 0 && lastJobData[0].periodStart);
 
 	const startDate = lastJobData && lastJobData.length > 0 ? lastJobData[0].periodStart : null;
 	const startDateStatemenet = startDate ? `AND t1.creationDate >= '${formatDate(startDate)}' ` : '';
@@ -37,12 +35,9 @@ export const buildSignatureTreasurePositionStats = async (
 		AND t2.bundleType = 'signature-treasure'
 		GROUP BY signatureTreasure, t1.playerClass, SUBSTRING_INDEX(t1.additionalResult, '-', 1), t1.result;
 	`;
-	// console.log('running query', allHeroesQuery);
 	const allHeroesResult: readonly any[] = await mysql.query(allHeroesQuery);
-	// console.log('allHeroPowersResult', allHeroesResult);
 
 	if (!allHeroesResult || allHeroesResult.length === 0) {
-		console.log('no new hero power info');
 		return;
 	}
 
@@ -66,7 +61,6 @@ export const buildSignatureTreasurePositionStats = async (
 		INSERT INTO duels_stats_signature_treasure_position (gameMode, periodStart, signatureTreasureCardId, heroClass, totalMatches, totalWins)
 		VALUES ${values}
 	`;
-	// console.log('running query', query);
 	await mysql.query(query);
 	return stats;
 };

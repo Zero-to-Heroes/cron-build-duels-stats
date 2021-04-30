@@ -19,22 +19,17 @@ const s3 = new S3();
 // the more traditional callback-style handler.
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
-	// console.log('event', JSON.stringify(event, null, 4));
 	await cards.initializeCardsDb();
 	const mysql = await getConnection();
 
 	await buildStats(mysql, cards, 'duels');
 	await buildStats(mysql, cards, 'paid-duels');
-	console.log('new stats inserted in db');
 
 	const stats = await loadStats(mysql);
-	console.log('built stats to cache');
 	await mysql.end();
 
 	const stringResults = JSON.stringify(stats);
-	console.log('stringified results');
 	const gzippedResults = gzipSync(stringResults);
-	console.log('zipped results');
 	await s3.writeFile(
 		gzippedResults,
 		'static.zerotoheroes.com',
@@ -42,7 +37,6 @@ export default async (event): Promise<any> => {
 		'application/json',
 		'gzip',
 	);
-	console.log('new stats saved to s3');
 
 	return { statusCode: 200, body: null };
 };
