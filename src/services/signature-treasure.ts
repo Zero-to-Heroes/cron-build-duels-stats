@@ -24,8 +24,7 @@ export const buildSignatureTreasureStats = async (
 	const allSignatureTreasuresQuery = `
 		SELECT t2.option1 as signatureTreasure, t1.playerClass, count(*) as count
 		FROM replay_summary t1
-		INNER JOIN replay_summary_secondary_data t3 ON t3.reviewId = t1.reviewId
-		INNER JOIN dungeon_run_loot_info t2 ON t3.duelsRunId = t2.runId
+		INNER JOIN dungeon_run_loot_info t2 ON t1.runId = t2.runId
 		WHERE t1.gameMode = '${gameMode}' 
 		AND t1.playerCardId like 'PVPDR_Hero%'
 		${startDateStatemenet}
@@ -41,8 +40,7 @@ export const buildSignatureTreasureStats = async (
 	const allSignatureTreasuresWonQuery = `
 		SELECT t2.option1 as signatureTreasure, t1.playerClass, count(*) as count
 		FROM replay_summary t1
-		INNER JOIN replay_summary_secondary_data t3 ON t3.reviewId = t1.reviewId
-		INNER JOIN dungeon_run_loot_info t2 ON t3.duelsRunId = t2.runId
+		INNER JOIN dungeon_run_loot_info t2 ON t1.runId = t2.runId
 		WHERE t1.gameMode = '${gameMode}' 
 		AND t1.playerCardId like 'PVPDR_Hero%'
 		${startDateStatemenet}
