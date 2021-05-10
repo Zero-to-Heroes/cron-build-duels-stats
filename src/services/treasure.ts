@@ -1,4 +1,5 @@
 import { AllCardsService } from '@firestone-hs/reference-data';
+import { TREASURES_REMOVED_CARDS } from '../retrieve-duels-global-stats';
 import { formatDate, getCardFromCardId } from '../utils/util-functions';
 
 export const buildTreasureStats = async (
@@ -77,6 +78,7 @@ export const buildTreasureStats = async (
 	}
 
 	const values = stats
+		.filter(stat => !TREASURES_REMOVED_CARDS.includes(stat.cardId))
 		.map(
 			stat =>
 				`('${gameMode}', '${stat.periodStart}', '${stat.cardId}', '${stat.playerClass}', ${stat.totalOffered}, ${stat.totalPicked})`,

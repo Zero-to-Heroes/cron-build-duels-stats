@@ -11,10 +11,15 @@ import {
 } from './stat';
 import { formatDate, groupByFunction, http } from './utils/util-functions';
 
-const TREASURES_REMOVED_CARDS = [
+export const TREASURES_REMOVED_CARDS = [
 	CardIds.NonCollectible.Neutral.RobesOfGaudiness,
 	CardIds.NonCollectible.Neutral.HeadmasterKelThuzad_MrBigglesworthToken,
 	CardIds.NonCollectible.Neutral.GattlingGunner,
+	CardIds.NonCollectible.Neutral.PhaorisBladeTavernBrawl,
+	CardIds.NonCollectible.Neutral.SandySurpriseTavernBrawl,
+	CardIds.NonCollectible.Neutral.CannibalismTavernBrawl1,
+	CardIds.NonCollectible.Neutral.LunarBand,
+	CardIds.NonCollectible.Neutral.StickyFingersGILNEAS,
 ];
 
 const allCards = new AllCardsService();
