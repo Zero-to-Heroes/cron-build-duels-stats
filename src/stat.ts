@@ -1,4 +1,4 @@
-import { ReferencePlayerClass } from '@firestone-hs/reference-data/lib/models/reference-cards/reference-player-class';
+import { ReferencePlayerClass } from '@firestone-hs/reference-data';
 
 export interface DuelsGlobalStats {
 	readonly lastUpdateDate: string;

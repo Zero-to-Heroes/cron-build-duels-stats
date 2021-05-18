@@ -1,5 +1,4 @@
-import { AllCardsService } from '@firestone-hs/reference-data';
-import { ReferenceCard } from '@firestone-hs/reference-data/lib/models/reference-cards/reference-card';
+import { AllCardsService, ReferenceCard } from '@firestone-hs/reference-data';
 import fetch, { RequestInfo } from 'node-fetch';
 
 function partitionArray<T>(array: readonly T[], partitionSize: number): readonly T[][] {

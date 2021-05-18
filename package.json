@@ -1,6 +1,6 @@
 {
 	"name": "@firestone-hs/duels-global-stats",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "",
 	"scripts": {
 		"lint": "eslint --color --fix --ext .ts .",
@@ -22,7 +22,7 @@
 	],
 	"dependencies": {
 		"@firestone-hs/hs-replay-xml-parser": "0.0.55",
-		"@firestone-hs/reference-data": "^0.1.87",
+		"@firestone-hs/reference-data": "^0.1.92",
 		"@types/elementtree": "^0.1.0",
 		"aws-sdk": "^2.524.0",
 		"cross-fetch": "^3.0.6",
