@@ -117,6 +117,7 @@ export class S3 {
 			if (encoding) {
 				input.ContentEncoding = encoding;
 			}
+			console.log('writing', input, content);
 			this.s3.upload(input, (err, data) => {
 				if (err) {
 					console.error('could not upload file to S3', err, input);
