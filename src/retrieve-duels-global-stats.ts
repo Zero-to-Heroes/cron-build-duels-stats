@@ -331,6 +331,7 @@ const loadDeckStats = async (
 		FROM duels_stats_deck
 		WHERE periodStart >= '${periodStart.toISOString()}'
 		AND gameMode = '${gameMode}'
+		AND rating >= 2000
 		ORDER BY id desc
 		LIMIT 500;
 	`;

@@ -4,6 +4,7 @@ import { gzipSync, constants } from 'zlib';
 import { getConnection } from './db/rds';
 import { S3 } from './db/s3';
 import { loadStats } from './retrieve-duels-global-stats';
+import { loadStatsOld } from './retrieve-duels-global-stats-old';
 import { buildHeroStats } from './services/hero';
 import { buildHeroPositionStats } from './services/hero-position';
 import { buildHeroPowerStats } from './services/hero-power';
@@ -26,24 +27,27 @@ export default async (event): Promise<any> => {
 	await buildStats(mysql, cards, 'paid-duels');
 
 	const stats = await loadStats(mysql);
+	const statsOld = await loadStatsOld(mysql);
 	await mysql.end();
 
-	const stringResults = JSON.stringify(stats);
-	const gzippedResults = gzipSync(stringResults, {
+	const gzippedResults = gzipSync(JSON.stringify(stats), {
 		level: constants.Z_BEST_COMPRESSION,
 	});
-	console.log('lengths', stringResults?.length, gzippedResults?.length);
-	// await s3.writeFile(
-	// 	gzippedResults,
-	// 	'static.zerotoheroes.com',
-	// 	'api/duels-global-stats.json',
-	// 	'application/json',
-	// 	'gzip',
-	// );
 	await s3.writeFile(
 		gzippedResults,
 		'static.zerotoheroes.com',
 		'api/duels-global-stats.gz.json',
+		'application/json',
+		'gzip',
+	);
+
+	const gzippedResultsOld = gzipSync(JSON.stringify(statsOld), {
+		level: constants.Z_BEST_COMPRESSION,
+	});
+	await s3.writeFile(
+		gzippedResultsOld,
+		'static.zerotoheroes.com',
+		'api/duels-global-stats.json',
 		'application/json',
 		'gzip',
 	);
