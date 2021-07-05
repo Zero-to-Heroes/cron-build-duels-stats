@@ -20,6 +20,7 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.NonCollectible.Neutral.CannibalismTavernBrawl1,
 	CardIds.NonCollectible.Neutral.LunarBand,
 	CardIds.NonCollectible.Neutral.StickyFingersGILNEAS,
+	CardIds.NonCollectible.Neutral.BandOfBees,
 ];
 
 const allCards = new AllCardsService();
