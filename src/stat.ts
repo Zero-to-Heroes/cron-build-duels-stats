@@ -1,5 +1,52 @@
 import { ReferencePlayerClass } from '@firestone-hs/reference-data';
 
+// This contains all the non-deck stats
+export interface DuelsStat {
+	readonly lastUpdateDate: string;
+	readonly heroes: readonly DuelsHeroStat[];
+	readonly treasures: readonly DuelsTreasureStat[];
+	readonly decks: readonly DeckStat[];
+	readonly mmrPercentiles: readonly MmrPercentile[];
+}
+
+export interface DuelsHeroStat {
+	readonly date: 'all-time' | 'past-three' | 'past-seven' | 'last-patch';
+	readonly playerClass: 'all' | string;
+	readonly heroPowerCardId: string;
+	readonly signatureTreasureCardId: string;
+	readonly gameMode: 'paid-duels';
+	readonly mmrPercentile: 100 | 50 | 25 | 10 | 1;
+	readonly totalRuns: number;
+	// Ties are ignored
+	readonly totalMatches: number;
+	readonly totalWins: number;
+	readonly totalLosses: number;
+	readonly winDistribution: { [winNumber: string]: number };
+}
+
+// Not the same as the DuelsHeroStat, as severalTreasureCardIds count towards the same run
+export interface DuelsTreasureStat {
+	readonly date: 'all-time' | 'past-three' | 'past-seven' | 'last-patch';
+	readonly playerClass: 'all' | string;
+	readonly treasureCardId: string;
+	readonly treasureType: 'treasure' | 'passive';
+	readonly heroPowerCardId: string;
+	readonly signatureTreasureCardId: string;
+	readonly gameMode: 'paid-duels';
+	readonly mmrPercentile: 100 | 50 | 25 | 10 | 1;
+	readonly totalRuns: number;
+	readonly totalMatches: number;
+	readonly totalWins: number;
+	readonly totalLosses: number;
+	readonly winDistribution: { [winNumber: string]: number };
+}
+
+export interface MmrPercentile {
+	readonly mmr: number;
+	readonly percentile: 100 | 50 | 25 | 10 | 1;
+}
+
+// This will ultimately only contain the deck stats
 export interface DuelsGlobalStats {
 	readonly lastUpdateDate: string;
 	readonly duels: DuelsGlobalStatsForGameMode;
@@ -68,6 +115,7 @@ export interface DeckStat {
 	readonly id: number;
 	readonly periodStart: string;
 	readonly gameMode: 'duels' | 'paid-duels';
+	readonly buildNumber: number;
 	readonly decklist: string;
 	readonly finalDecklist: string;
 	readonly playerClass: string;
