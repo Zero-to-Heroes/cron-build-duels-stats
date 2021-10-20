@@ -12,7 +12,7 @@ Resources:
             Runtime: nodejs10.x
             Timeout: 900
             CodeUri: ./dist/build-duels-stats
-            MemorySize: 512
+            MemorySize: 768
             # https://stackoverflow.com/questions/39144688/aws-lambda-invoke-not-calling-another-lambda-function-node-js
             # VpcConfig:
             #     SecurityGroupIds:
@@ -26,7 +26,7 @@ Resources:
                 - SecretsManagerReadWrite
                 - AmazonSNSReadOnlyAccess
                 - AmazonS3FullAccess
-                - arn:aws:iam::478062583808:policy/CloudWatchPolicyForLambda # See https://stackoverflow.com/questions/51166504/disable-cloudwatch-to-monitor-logs-for-lambda-function
+                # - arn:aws:iam::478062583808:policy/CloudWatchPolicyForLambda # See https://stackoverflow.com/questions/51166504/disable-cloudwatch-to-monitor-logs-for-lambda-function
             Tags:
                 LambdaName: cron-build-duels-stats
             Events:
@@ -34,4 +34,4 @@ Resources:
                 LastPeriodTrigger:
                     Type: Schedule
                     Properties:
-                        Schedule: cron(0 4 * * ? *) # Triggers every day at 4 AM. Make sure it runs after the MR job so we can safely cache the JSON results
+                        Schedule: cron(0 */4 * * ? *)

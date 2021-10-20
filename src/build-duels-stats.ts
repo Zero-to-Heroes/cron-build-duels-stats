@@ -14,9 +14,11 @@ const s3 = new S3();
 export default async (event): Promise<any> => {
 	await cards.initializeCardsDb();
 	const mysql = await getConnection();
+	console.log('building new stats');
 	const newStats = await loadNewStats(mysql);
 	await mysql.end();
 
+	console.log('saving stats');
 	const gzippedNewResults = gzipSync(JSON.stringify(newStats), {
 		level: constants.Z_BEST_COMPRESSION,
 	});

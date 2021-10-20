@@ -41,15 +41,6 @@ const buildMmrPercentiles = (rows: readonly InternalDuelsRow[]): readonly MmrPer
 	const top10 = sortedMmrs[Math.floor((sortedMmrs.length / 10) * 9)];
 	const top1 = sortedMmrs[Math.floor((sortedMmrs.length / 100) * 99)];
 	console.debug('percentiles', median, top25, top10, top1);
-	// console.debug(
-	// 	'percentiles index',
-	// 	Math.floor(sortedMmrs.length / 2),
-	// 	Math.floor((sortedMmrs.length / 4) * 3),
-	// 	Math.floor((sortedMmrs.length / 10) * 9),
-	// 	Math.floor((sortedMmrs.length / 100) * 99),
-	// );
-	// console.debug('cherry picked', sortedMmrs[15389], sortedMmrs[15380], sortedMmrs[15540]);
-	// console.debug('sorted', sortedMmrs.slice(0, 20), sortedMmrs.slice(sortedMmrs.length - 20, sortedMmrs.length));
 	return [
 		{
 			percentile: 100,
@@ -285,8 +276,8 @@ const getLastPatch = async (): Promise<PatchInfo> => {
 
 interface PatchInfo {
 	readonly number: number;
-	readonly version: string;
 	readonly name: string;
+	readonly version: string;
 	readonly date: string;
 }
 
