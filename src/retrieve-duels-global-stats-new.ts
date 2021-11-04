@@ -5,15 +5,20 @@ import { DeckStat, DuelsHeroStat, DuelsStat, DuelsTreasureStat, MmrPercentile } 
 import { formatDate, groupByFunction, http } from './utils/util-functions';
 
 export const TREASURES_REMOVED_CARDS = [
-	CardIds.NonCollectible.Neutral.RobesOfGaudiness,
-	CardIds.NonCollectible.Neutral.HeadmasterKelThuzad_MrBigglesworthToken,
-	CardIds.NonCollectible.Neutral.GattlingGunner,
-	CardIds.NonCollectible.Neutral.PhaorisBladeTavernBrawl,
-	CardIds.NonCollectible.Neutral.SandySurpriseTavernBrawl,
-	CardIds.NonCollectible.Neutral.CannibalismTavernBrawl1,
-	CardIds.NonCollectible.Neutral.LunarBand,
-	CardIds.NonCollectible.Neutral.StickyFingersGILNEAS,
-	CardIds.NonCollectible.Neutral.BandOfBees,
+	CardIds.RobesOfGaudiness,
+	CardIds.HeadmasterKelthuzad_MrBigglesworthToken,
+	CardIds.GattlingGunner,
+	CardIds.PhaorisBladeTavernBrawl,
+	CardIds.SandySurpriseTavernBrawl,
+	CardIds.CannibalismTavernBrawl,
+	CardIds.LunarBandTavernBrawl,
+	CardIds.StickyFingers,
+	CardIds.BandOfBees,
+	// 21.6
+	CardIds.SmallPouchesTavernBrawl,
+	CardIds.RhoninsScryingOrbTavernBrawl,
+	CardIds.Caltrops,
+	CardIds.ScatteredCaltropsTavernBrawl,
 ];
 
 const allCards = new AllCardsService();
