@@ -165,7 +165,8 @@ const buildTreasuresForMmr = (
 				};
 			}
 			return row;
-		});
+		})
+		.filter(info => !TREASURES_REMOVED_CARDS.includes(info.treasure as CardIds));
 	const allTimeTreasures = buildTreasureStats(denormalizedRows, 'all-time');
 	const lastPatchTreasures = buildTreasureStats(
 		denormalizedRows.filter(
