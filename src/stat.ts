@@ -5,12 +5,29 @@ export interface DuelsStat {
 	readonly lastUpdateDate: string;
 	readonly heroes: readonly DuelsHeroStat[];
 	readonly treasures: readonly DuelsTreasureStat[];
-	readonly decks: readonly DeckStat[];
 	readonly mmrPercentiles: readonly MmrPercentile[];
+	readonly dates: readonly DateMark[];
 }
 
+export interface DuelsStatDecks {
+	readonly lastUpdateDate: string;
+	readonly decks: readonly DeckStat[];
+}
+
+export interface InternalDuelsStat {
+	readonly lastUpdateDate: string;
+	readonly heroes: readonly DuelsHeroStat[];
+	readonly treasures: readonly DuelsTreasureStat[];
+	readonly decks: readonly DeckStat[];
+	readonly mmrPercentiles: readonly MmrPercentile[];
+	readonly dates: readonly DateMark[];
+}
+
+export type DateMark = 'all-time' | 'last-patch' | 'past-seven' | 'past-three';
+
 export interface DuelsHeroStat {
-	readonly date: 'all-time' | 'past-three' | 'past-seven' | 'last-patch';
+	readonly date: DateMark;
+	readonly hero: string;
 	readonly playerClass: 'all' | string;
 	readonly heroPowerCardId: string;
 	readonly signatureTreasureCardId: string;
@@ -26,7 +43,8 @@ export interface DuelsHeroStat {
 
 // Not the same as the DuelsHeroStat, as severalTreasureCardIds count towards the same run
 export interface DuelsTreasureStat {
-	readonly date: 'all-time' | 'past-three' | 'past-seven' | 'last-patch';
+	readonly date: DateMark;
+	readonly hero: string;
 	readonly playerClass: 'all' | string;
 	readonly treasureCardId: string;
 	readonly treasureType: 'treasure' | 'passive';

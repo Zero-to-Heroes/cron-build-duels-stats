@@ -1,26 +1,46 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { AllCardsService, CardIds } from '@firestone-hs/reference-data';
 import { ServerlessMysql } from 'serverless-mysql';
-import { TREASURES_REMOVED_CARDS } from './retrieve-duels-global-stats';
-import { DeckStat, DuelsHeroStat, DuelsTreasureStat, InternalDuelsStat, MmrPercentile } from './stat';
+import { DateMark, DeckStat, DuelsHeroStat, DuelsTreasureStat, InternalDuelsStat, MmrPercentile } from './stat';
 import { formatDate, groupByFunction, http } from './utils/util-functions';
+
+export const TREASURES_REMOVED_CARDS = [
+	CardIds.RobesOfGaudiness,
+	CardIds.HeadmasterKelthuzad_MrBigglesworthToken,
+	CardIds.GattlingGunner,
+	CardIds.PhaorisBladeTavernBrawl,
+	CardIds.SandySurpriseTavernBrawl,
+	CardIds.CannibalismTavernBrawl,
+	CardIds.LunarBandTavernBrawl,
+	CardIds.StickyFingers,
+	CardIds.BandOfBees,
+	// 21.6
+	CardIds.SmallPouchesTavernBrawl,
+	CardIds.RhoninsScryingOrbTavernBrawl,
+	CardIds.Caltrops,
+	CardIds.ScatteredCaltropsTavernBrawl,
+	// 22.2
+	CardIds.FireshaperTavernBrawl,
+	CardIds.EverChangingElixirTavernBrawl,
+	CardIds.LocuuuustsTavernBrawl,
+	CardIds.ConduitOfTheStormsTavernBrawl,
+];
 
 const allCards = new AllCardsService();
 
-export const loadNewStats = async (mysql: ServerlessMysql): Promise<InternalDuelsStat> => {
+export const loadStats = async (mysql: ServerlessMysql): Promise<InternalDuelsStat> => {
 	await allCards.initializeCardsDb();
 	const [lastPatch] = await Promise.all([getLastPatch()]);
-
 	const rows: readonly InternalDuelsRow[] = await loadRows(mysql);
 	const mmrPercentiles: readonly MmrPercentile[] = buildMmrPercentiles(rows);
 
 	return {
 		lastUpdateDate: formatDate(new Date()),
+		mmrPercentiles: mmrPercentiles,
+		dates: ['all-time', 'last-patch', 'past-seven', 'past-three'],
 		heroes: buildHeroes(rows, lastPatch, mmrPercentiles),
 		treasures: buildTreasures(rows, lastPatch, mmrPercentiles),
 		decks: loadDeckStats(rows),
-		mmrPercentiles: mmrPercentiles,
-		dates: ['all-time', 'last-patch', 'past-seven', 'past-three'],
 	};
 };
 
@@ -175,8 +195,9 @@ const buildTreasureStats = (
 	period: string,
 ): readonly DuelsTreasureStat[] => {
 	const grouped: { [groupingKey: string]: readonly InternalDuelsTreasureRow[] } = groupByFunction(
+		// hero is needed for Vanndar and Drekkar, since they can have multiple classes depending on their treasure
 		(row: InternalDuelsTreasureRow) =>
-			`${row.playerClass}-${row.treasure}-${row.heroPower}-${row.signatureTreasure}`,
+			`${row.hero}-${row.playerClass}-${row.treasure}-${row.heroPower}-${row.signatureTreasure}`,
 	)(rows);
 	return Object.values(grouped).map(groupedRows => {
 		const ref = groupedRows[0];
@@ -190,6 +211,7 @@ const buildTreasureStats = (
 		return {
 			date: period,
 			gameMode: 'paid-duels',
+			hero: ref.hero,
 			playerClass: ref.playerClass,
 			heroPowerCardId: ref.heroPower,
 			treasureCardId: ref.treasure,
@@ -204,9 +226,9 @@ const buildTreasureStats = (
 	});
 };
 
-const buildHeroStats = (rows: readonly InternalDuelsRow[], period: string): readonly DuelsHeroStat[] => {
+const buildHeroStats = (rows: readonly InternalDuelsRow[], period: DateMark): readonly DuelsHeroStat[] => {
 	const grouped: { [groupingKey: string]: readonly InternalDuelsRow[] } = groupByFunction(
-		(row: InternalDuelsRow) => `${row.playerClass}-${row.heroPower}-${row.signatureTreasure}`,
+		(row: InternalDuelsRow) => `${row.hero}-${row.playerClass}-${row.heroPower}-${row.signatureTreasure}`,
 	)(rows);
 	return Object.values(grouped).map(groupedRows => {
 		const ref = groupedRows[0];
@@ -220,6 +242,7 @@ const buildHeroStats = (rows: readonly InternalDuelsRow[], period: string): read
 		return {
 			date: period,
 			gameMode: 'paid-duels',
+			hero: ref.hero,
 			playerClass: ref.playerClass,
 			heroPowerCardId: ref.heroPower,
 			signatureTreasureCardId: ref.signatureTreasure,
@@ -244,6 +267,7 @@ const loadDeckStats = (rows: readonly InternalDuelsRow[]): readonly DeckStat[] =
 			buildNumber: row.buildNumber,
 			decklist: row.decklist,
 			finalDecklist: row.finalDecklist,
+			hero: row.hero,
 			playerClass: row.playerClass,
 			heroCardId: row.hero,
 			heroPowerCardId: row.heroPower,
