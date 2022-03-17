@@ -41,6 +41,10 @@ export default async (event): Promise<any> => {
 const handleSplitDuelsStats = async (mysql: ServerlessMysql) => {
 	console.log('building new stats with hero class');
 	const stats: InternalDuelsStat = await loadStats(mysql);
+	if (!stats) {
+		console.error('no stats');
+		return;
+	}
 
 	console.log('saving global statsstats');
 	const gzippedNewResults2 = gzipSync(JSON.stringify(stats), {

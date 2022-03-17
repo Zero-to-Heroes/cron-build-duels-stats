@@ -31,6 +31,7 @@ const allCards = new AllCardsService();
 export const loadStats = async (mysql: ServerlessMysql): Promise<InternalDuelsStat> => {
 	await allCards.initializeCardsDb();
 	const [lastPatch] = await Promise.all([getLastPatch()]);
+	console.debug('last patch', lastPatch);
 	const rows: readonly InternalDuelsRow[] = await loadRows(mysql);
 	const mmrPercentiles: readonly MmrPercentile[] = buildMmrPercentiles(rows);
 
@@ -109,7 +110,11 @@ const buildHeroes = (
 const buildHeroesForMmr = (rows: readonly InternalDuelsRow[], lastPatch: PatchInfo): readonly DuelsHeroStat[] => {
 	const allTimeHeroes = buildHeroStats(rows, 'all-time');
 	const lastPatchHeroes = buildHeroStats(
-		rows.filter(row => row.buildNumber >= lastPatch.number && row.runEndDate > new Date(lastPatch.date)),
+		rows.filter(
+			row =>
+				row.buildNumber >= lastPatch.number ||
+				row.runEndDate.getTime() > new Date(lastPatch.date).getTime() + 24 * 60 * 60 * 1000,
+		),
 		'last-patch',
 	);
 	const threeDaysHeroes = buildHeroStats(
@@ -175,7 +180,9 @@ const buildTreasuresForMmr = (
 	const allTimeTreasures = buildTreasureStats(denormalizedRows, 'all-time');
 	const lastPatchTreasures = buildTreasureStats(
 		denormalizedRows.filter(
-			row => row.buildNumber >= lastPatch.number && row.runEndDate > new Date(lastPatch.date),
+			row =>
+				row.buildNumber >= lastPatch.number ||
+				row.runEndDate.getTime() > new Date(lastPatch.date).getTime() + 24 * 60 * 60 * 1000,
 		),
 		'last-patch',
 	);
