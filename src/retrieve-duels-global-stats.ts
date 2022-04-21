@@ -10,7 +10,6 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.GattlingGunner,
 	CardIds.PhaorisBladeTavernBrawl,
 	CardIds.SandySurpriseTavernBrawl,
-	CardIds.CannibalismTavernBrawl,
 	CardIds.LunarBandTavernBrawl,
 	CardIds.StickyFingers,
 	CardIds.BandOfBees,
