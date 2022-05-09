@@ -5,7 +5,7 @@ import { constants, gzipSync } from 'zlib';
 import { getConnection } from './db/rds';
 import { S3 } from './db/s3';
 import { loadStats } from './retrieve-duels-global-stats';
-import { DateMark, DuelsStat, DuelsStatDecks, InternalDuelsStat, MmrPercentile } from './stat';
+import { DuelsStat, DuelsStatDecks, InternalDuelsStat } from './stat';
 
 const cards = new AllCardsService();
 const s3 = new S3();
@@ -61,7 +61,6 @@ const handleSplitDuelsStats = async (mysql: ServerlessMysql) => {
 	// Now split the stats in smaller files, based on:
 	// - MMR
 	// - Time
-	const combinations: { percentile: MmrPercentile; date: DateMark }[] = [];
 	for (const percentile of stats.mmrPercentiles) {
 		for (const dateMark of stats.dates) {
 			console.log('filtering stats for', percentile, dateMark);
@@ -74,6 +73,7 @@ const handleSplitDuelsStats = async (mysql: ServerlessMysql) => {
 					.filter(stat => stat.mmrPercentile === percentile.percentile)
 					.filter(stat => stat.date === dateMark),
 			};
+			delete (partialStats as any).decks;
 			const gzipped = gzipSync(JSON.stringify(partialStats), {
 				level: constants.Z_BEST_COMPRESSION,
 			});
