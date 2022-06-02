@@ -23,6 +23,10 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.EverChangingElixirTavernBrawl,
 	CardIds.LocuuuustsTavernBrawl,
 	CardIds.ConduitOfTheStormsTavernBrawl,
+	// 23.2
+	CardIds.DragonAffinity,
+	CardIds.DragonAffinityTavernBrawl,
+	CardIds.DisksOfLegend,
 ];
 
 const allCards = new AllCardsService();

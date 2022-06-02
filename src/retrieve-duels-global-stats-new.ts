@@ -58,7 +58,7 @@ const buildMmrPercentiles = (rows: readonly InternalDuelsRow[]): readonly MmrPer
 const loadRows = async (mysql: ServerlessMysql): Promise<readonly InternalDuelsRow[]> => {
 	const query = `
 		SELECT * FROM duels_stats_by_run
-		WHERE runEndDate > DATE_SUB(NOW(), INTERVAL 100 DAY)
+		WHERE runEndDate > DATE_SUB(NOW(), INTERVAL 70 DAY)
 		AND decklist IS NOT NULL;
 	`;
 	console.log('running query', query);
