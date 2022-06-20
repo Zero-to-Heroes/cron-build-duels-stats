@@ -17,21 +17,6 @@ export default async (event): Promise<any> => {
 	await cards.initializeCardsDb();
 	const mysql = await getConnection();
 
-	// console.log('building new stats');
-	// const newStats = await loadNewStats(mysql);
-
-	// console.log('saving stats');
-	// const gzippedNewResults = gzipSync(JSON.stringify(newStats), {
-	// 	level: constants.Z_BEST_COMPRESSION,
-	// });
-	// await s3.writeFile(
-	// 	gzippedNewResults,
-	// 	'static.zerotoheroes.com',
-	// 	'api/duels-global-stats-heroes.gz.json',
-	// 	'application/json',
-	// 	'gzip',
-	// );
-
 	await handleSplitDuelsStats(mysql);
 	await mysql.end();
 

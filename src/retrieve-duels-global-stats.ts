@@ -37,14 +37,20 @@ export const loadStats = async (mysql: ServerlessMysql): Promise<InternalDuelsSt
 	console.debug('last patch', lastPatch);
 	const rows: readonly InternalDuelsRow[] = await loadRows(mysql);
 	const mmrPercentiles: readonly MmrPercentile[] = buildMmrPercentiles(rows);
+	const heroes = buildHeroes(rows, lastPatch, mmrPercentiles);
+	console.log('finished building heroes');
+	const treasures = buildTreasures(rows, lastPatch, mmrPercentiles);
+	console.log('finished building treasures');
+	const decks = loadDeckStats(rows);
+	console.log('finished building decks');
 
 	return {
 		lastUpdateDate: formatDate(new Date()),
 		mmrPercentiles: mmrPercentiles,
 		dates: ['all-time', 'last-patch', 'past-seven', 'past-three'],
-		heroes: buildHeroes(rows, lastPatch, mmrPercentiles),
-		treasures: buildTreasures(rows, lastPatch, mmrPercentiles),
-		decks: loadDeckStats(rows),
+		heroes: heroes,
+		treasures: treasures,
+		decks: decks,
 	};
 };
 
@@ -82,7 +88,7 @@ const buildMmrPercentiles = (rows: readonly InternalDuelsRow[]): readonly MmrPer
 const loadRows = async (mysql: ServerlessMysql): Promise<readonly InternalDuelsRow[]> => {
 	const query = `
 		SELECT * FROM duels_stats_by_run
-		WHERE runEndDate > DATE_SUB(NOW(), INTERVAL 100 DAY)
+		WHERE runEndDate > DATE_SUB(NOW(), INTERVAL 70 DAY)
 		AND decklist IS NOT NULL;
 	`;
 	console.log('running query', query);
@@ -111,7 +117,11 @@ const buildHeroes = (
 };
 
 const buildHeroesForMmr = (rows: readonly InternalDuelsRow[], lastPatch: PatchInfo): readonly DuelsHeroStat[] => {
+	console.log('building heroes for mmr', rows.length);
+
 	const allTimeHeroes = buildHeroStats(rows, 'all-time');
+	console.log('built all-time heroes');
+
 	const lastPatchHeroes = buildHeroStats(
 		rows.filter(
 			row =>
@@ -120,14 +130,20 @@ const buildHeroesForMmr = (rows: readonly InternalDuelsRow[], lastPatch: PatchIn
 		),
 		'last-patch',
 	);
+	console.log('built last-patch heroes');
+
 	const threeDaysHeroes = buildHeroStats(
 		rows.filter(row => row.runEndDate >= new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000)),
 		'past-three',
 	);
+	console.log('built past-three heroes');
+
 	const sevenDaysHeroes = buildHeroStats(
 		rows.filter(row => row.runEndDate >= new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)),
 		'past-seven',
 	);
+	console.log('built past-seven heroes');
+
 	return [...allTimeHeroes, ...lastPatchHeroes, ...threeDaysHeroes, ...sevenDaysHeroes];
 };
 
@@ -136,6 +152,7 @@ const buildTreasures = (
 	lastPatch: PatchInfo,
 	mmrPercentiles: readonly MmrPercentile[],
 ): readonly DuelsTreasureStat[] => {
+	console.log('building treasures');
 	return mmrPercentiles
 		.map(
 			mmrPercentile =>
@@ -155,6 +172,7 @@ const buildTreasuresForMmr = (
 	lastPatch: PatchInfo,
 ): readonly DuelsTreasureStat[] => {
 	// So that we have one treasure per row
+	console.log('building treasures for mmr');
 	const denormalizedRows: readonly InternalDuelsTreasureRow[] = rows
 		.map(row => [
 			...row.treasures.split(',').map(treasure => ({
@@ -180,7 +198,11 @@ const buildTreasuresForMmr = (
 			return row;
 		})
 		.filter(info => !TREASURES_REMOVED_CARDS.includes(info.treasure as CardIds));
+	console.log('denormalized rows');
+
 	const allTimeTreasures = buildTreasureStats(denormalizedRows, 'all-time');
+	console.log('built all-time');
+
 	const lastPatchTreasures = buildTreasureStats(
 		denormalizedRows.filter(
 			row =>
@@ -189,14 +211,20 @@ const buildTreasuresForMmr = (
 		),
 		'last-patch',
 	);
+	console.log('built last-patch');
+
 	const threeDaysTreasures = buildTreasureStats(
 		denormalizedRows.filter(row => row.runEndDate >= new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000)),
 		'past-three',
 	);
+	console.log('built past-three');
+
 	const sevenDaysTreasures = buildTreasureStats(
 		denormalizedRows.filter(row => row.runEndDate >= new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)),
 		'past-seven',
 	);
+	console.log('built past-seven');
+
 	return [...allTimeTreasures, ...lastPatchTreasures, ...threeDaysTreasures, ...sevenDaysTreasures];
 };
 
@@ -240,6 +268,7 @@ const buildHeroStats = (rows: readonly InternalDuelsRow[], period: DateMark): re
 	const grouped: { [groupingKey: string]: readonly InternalDuelsRow[] } = groupByFunction(
 		(row: InternalDuelsRow) => `${row.hero}-${row.playerClass}-${row.heroPower}-${row.signatureTreasure}`,
 	)(rows);
+	console.log('grouped');
 	return Object.values(grouped).map(groupedRows => {
 		const ref = groupedRows[0];
 		const winsDistribution: { [winNumber: string]: number } = {};
@@ -266,9 +295,10 @@ const buildHeroStats = (rows: readonly InternalDuelsRow[], period: DateMark): re
 };
 
 const loadDeckStats = (rows: readonly InternalDuelsRow[]): readonly DeckStat[] => {
-	return rows
-		.filter(row => row.rating >= 4000)
-		.filter(row => row.wins >= 10)
+	console.log('building decks');
+	const afterFilter = rows.filter(row => row.rating >= 4000).filter(row => row.wins >= 10);
+	console.log('filtered decks');
+	return afterFilter
 		.sort((a, b) => b.runEndDate.getTime() - a.runEndDate.getTime())
 		.map(row => ({
 			id: row.id,

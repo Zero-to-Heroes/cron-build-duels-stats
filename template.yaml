@@ -30,7 +30,6 @@ Resources:
             Tags:
                 LambdaName: cron-build-duels-stats
             Events:
-                # Populate the info on the last hour
                 LastPeriodTrigger:
                     Type: Schedule
                     Properties:
