@@ -8,7 +8,7 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.RobesOfGaudiness,
 	CardIds.HeadmasterKelthuzad_MrBigglesworthToken,
 	CardIds.GattlingGunner,
-	CardIds.PhaorisBladeTavernBrawl,
+	CardIds.PhaorisBlade_ULDA_043,
 	CardIds.SandySurpriseTavernBrawl,
 	CardIds.LunarBandTavernBrawl,
 	CardIds.StickyFingers,
