@@ -8,7 +8,7 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.RobesOfGaudiness,
 	CardIds.HeadmasterKelthuzad_MrBigglesworthToken,
 	CardIds.GattlingGunner,
-	CardIds.PhaorisBlade_ULDA_043,
+	CardIds.PhaorisBladeTavernBrawl,
 	CardIds.SandySurpriseTavernBrawl,
 	CardIds.LunarBandTavernBrawl,
 	CardIds.StickyFingers,
@@ -27,6 +27,8 @@ export const TREASURES_REMOVED_CARDS = [
 	CardIds.DragonAffinity,
 	CardIds.DragonAffinityTavernBrawl,
 	CardIds.DisksOfLegend,
+	// 24.0
+	CardIds.PlaguebringerTavernBrawl,
 ];
 
 const allCards = new AllCardsService();
