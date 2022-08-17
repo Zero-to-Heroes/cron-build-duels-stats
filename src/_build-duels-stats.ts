@@ -2,11 +2,12 @@
 import { getConnection, S3 } from '@firestone-hs/aws-lambda-utils';
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { constants, gzipSync } from 'zlib';
-import { loadDeckStats } from './retrieve-duels-deck-stats';
-import { loadStats } from './retrieve-duels-global-stats';
+import { loadDeckStats } from './build-deck-stats';
+import { loadStats } from './build-global-stats';
 import { DeckStat, DuelsStat, DuelsStatDecks, InternalDuelsStat } from './stat';
+import { formatDate } from './utils/util-functions';
 
-const cards = new AllCardsService();
+export const cards = new AllCardsService();
 const s3 = new S3();
 
 // This example demonstrates a NodeJS 8.10 async handler[1], however of course you could use
@@ -14,9 +15,7 @@ const s3 = new S3();
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
 	await cards.initializeCardsDb();
-
 	await handleSplitDuelsStats();
-
 	return { statusCode: 200, body: null };
 };
 
@@ -29,18 +28,6 @@ const handleSplitDuelsStats = async () => {
 		console.error('no stats');
 		return;
 	}
-
-	console.log('saving global statsstats');
-	const gzippedNewResults2 = gzipSync(JSON.stringify(stats), {
-		level: constants.Z_BEST_COMPRESSION,
-	});
-	await s3.writeFile(
-		gzippedNewResults2,
-		'static.zerotoheroes.com',
-		'api/duels-global-stats-hero-class.gz.json',
-		'application/json',
-		'gzip',
-	);
 
 	// Now split the stats in smaller files, based on:
 	// - MMR
@@ -78,9 +65,10 @@ const handleSplitDuelsStats = async () => {
 	const decks: readonly DeckStat[] = await loadDeckStats(mysql2);
 	await mysql2.end();
 	const statsForDecks: DuelsStatDecks = {
-		lastUpdateDate: stats.lastUpdateDate,
+		lastUpdateDate: formatDate(new Date()),
 		decks: decks,
 	};
+	console.log('built decks', decks.length);
 	const gzipped = gzipSync(JSON.stringify(statsForDecks), {
 		level: constants.Z_BEST_COMPRESSION,
 	});

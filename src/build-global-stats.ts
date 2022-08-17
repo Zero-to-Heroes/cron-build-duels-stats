@@ -172,21 +172,21 @@ const buildTreasuresForMmr = (
 	lastPatch: PatchInfo,
 ): readonly DuelsTreasureStat[] => {
 	// So that we have one treasure per row
-	console.log('building treasures for mmr');
-	const denormalizedRows: readonly InternalDuelsTreasureRow[] = rows
-		.map(row => [
-			...row.treasures.split(',').map(treasure => ({
-				...row,
-				treasure: treasure,
-				type: 'treasure' as any,
-			})),
-			...row.passives.split(',').map(treasure => ({
-				...row,
-				treasure: treasure,
-				type: 'passive' as any,
-			})),
-		])
-		.reduce((a, b) => a.concat(b), [])
+	console.log('building treasures for mmr', rows.length, rows[0]);
+	const intermediate: readonly InternalDuelsTreasureRow[] = rows.flatMap(row => [
+		...row.treasures.split(',').map(treasure => ({
+			...row,
+			treasure: treasure,
+			type: 'treasure' as any,
+		})),
+		...row.passives.split(',').map(treasure => ({
+			...row,
+			treasure: treasure,
+			type: 'passive' as any,
+		})),
+	]);
+	console.log('intermediate', intermediate.length, intermediate[0]);
+	const denormalizedRows = intermediate
 		.map(row => {
 			// Happens when users don't have the updated cards DB yet
 			if (+row.treasure > 0) {
@@ -198,7 +198,7 @@ const buildTreasuresForMmr = (
 			return row;
 		})
 		.filter(info => !TREASURES_REMOVED_CARDS.includes(info.treasure as CardIds));
-	console.log('denormalized rows');
+	console.log('denormalized rows', denormalizedRows.length, denormalizedRows[0]);
 
 	const allTimeTreasures = buildTreasureStats(denormalizedRows, 'all-time');
 	console.log('built all-time');
