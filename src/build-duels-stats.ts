@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { AllCardsService } from '@firestone-hs/reference-data';
-import { ServerlessMysql } from 'serverless-mysql';
 import { constants, gzipSync } from 'zlib';
 import { getConnection } from './db/rds';
 import { S3 } from './db/s3';
+import { loadDeckStats } from './retrieve-duels-deck-stats';
 import { loadStats } from './retrieve-duels-global-stats';
-import { DuelsStat, DuelsStatDecks, InternalDuelsStat } from './stat';
+import { DeckStat, DuelsStat, DuelsStatDecks, InternalDuelsStat } from './stat';
 
 const cards = new AllCardsService();
 const s3 = new S3();
@@ -15,17 +15,17 @@ const s3 = new S3();
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
 	await cards.initializeCardsDb();
-	const mysql = await getConnection();
 
-	await handleSplitDuelsStats(mysql);
-	await mysql.end();
+	await handleSplitDuelsStats();
 
 	return { statusCode: 200, body: null };
 };
 
-const handleSplitDuelsStats = async (mysql: ServerlessMysql) => {
+const handleSplitDuelsStats = async () => {
 	console.log('building new stats with hero class');
+	const mysql = await getConnection();
 	const stats: InternalDuelsStat = await loadStats(mysql);
+	await mysql.end();
 	if (!stats) {
 		console.error('no stats');
 		return;
@@ -75,9 +75,12 @@ const handleSplitDuelsStats = async (mysql: ServerlessMysql) => {
 	}
 
 	console.log('building stats for decks');
+	const mysql2 = await getConnection();
+	const decks: readonly DeckStat[] = await loadDeckStats(mysql2);
+	await mysql2.end();
 	const statsForDecks: DuelsStatDecks = {
 		lastUpdateDate: stats.lastUpdateDate,
-		decks: stats.decks,
+		decks: decks,
 	};
 	const gzipped = gzipSync(JSON.stringify(statsForDecks), {
 		level: constants.Z_BEST_COMPRESSION,

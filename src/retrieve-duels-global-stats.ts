@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { AllCardsService, CardIds } from '@firestone-hs/reference-data';
 import { ServerlessMysql } from 'serverless-mysql';
-import { DateMark, DeckStat, DuelsHeroStat, DuelsTreasureStat, InternalDuelsStat, MmrPercentile } from './stat';
+import { DateMark, DuelsHeroStat, DuelsTreasureStat, InternalDuelsStat, MmrPercentile } from './stat';
 import { formatDate, groupByFunction, http } from './utils/util-functions';
 
 export const TREASURES_REMOVED_CARDS = [
@@ -43,8 +43,6 @@ export const loadStats = async (mysql: ServerlessMysql): Promise<InternalDuelsSt
 	console.log('finished building heroes');
 	const treasures = buildTreasures(rows, lastPatch, mmrPercentiles);
 	console.log('finished building treasures');
-	const decks = loadDeckStats(rows);
-	console.log('finished building decks');
 
 	return {
 		lastUpdateDate: formatDate(new Date()),
@@ -52,7 +50,6 @@ export const loadStats = async (mysql: ServerlessMysql): Promise<InternalDuelsSt
 		dates: ['all-time', 'last-patch', 'past-seven', 'past-three'],
 		heroes: heroes,
 		treasures: treasures,
-		decks: decks,
 	};
 };
 
@@ -294,34 +291,6 @@ const buildHeroStats = (rows: readonly InternalDuelsRow[], period: DateMark): re
 			winDistribution: winsDistribution,
 		} as DuelsHeroStat;
 	});
-};
-
-const loadDeckStats = (rows: readonly InternalDuelsRow[]): readonly DeckStat[] => {
-	console.log('building decks');
-	const afterFilter = rows.filter(row => row.rating >= 4000).filter(row => row.wins >= 10);
-	console.log('filtered decks');
-	return afterFilter
-		.sort((a, b) => b.runEndDate.getTime() - a.runEndDate.getTime())
-		.map(row => ({
-			id: row.id,
-			gameMode: row.gameMode,
-			periodStart: formatDate(row.runEndDate),
-			buildNumber: row.buildNumber,
-			decklist: row.decklist,
-			finalDecklist: row.finalDecklist,
-			hero: row.hero,
-			playerClass: row.playerClass,
-			heroCardId: row.hero,
-			heroPowerCardId: row.heroPower,
-			signatureTreasureCardId: row.signatureTreasure,
-			treasuresCardIds: [...row.passives.split(','), ...row.treasures.split(',')].filter(t => !!t),
-			runId: row.runId,
-			wins: row.wins,
-			losses: row.losses,
-			rating: row.rating,
-			runStartDate: formatDate(row.runStartDate),
-		}))
-		.slice(0, 1000);
 };
 
 const getLastPatch = async (): Promise<PatchInfo> => {

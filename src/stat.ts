@@ -18,7 +18,6 @@ export interface InternalDuelsStat {
 	readonly lastUpdateDate: string;
 	readonly heroes: readonly DuelsHeroStat[];
 	readonly treasures: readonly DuelsTreasureStat[];
-	readonly decks: readonly DeckStat[];
 	readonly mmrPercentiles: readonly MmrPercentile[];
 	readonly dates: readonly DateMark[];
 }
