@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { getConnection, S3 } from '@firestone-hs/aws-lambda-utils';
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { constants, gzipSync } from 'zlib';
-import { getConnection } from './db/rds';
-import { S3 } from './db/s3';
 import { loadDeckStats } from './retrieve-duels-deck-stats';
 import { loadStats } from './retrieve-duels-global-stats';
 import { DeckStat, DuelsStat, DuelsStatDecks, InternalDuelsStat } from './stat';
