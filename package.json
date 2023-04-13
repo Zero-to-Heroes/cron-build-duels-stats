@@ -6,10 +6,11 @@
 		"lint": "eslint --color --fix --ext .ts .",
 		"start": "webpack -w --color",
 		"test": "jest",
-		"build": "npm audit fix && webpack --env.buildEnv=prod --color",
+		"build": "webpack --env.buildEnv=prod --color",
 		"package": "sam package --template-file template.yaml --s3-bucket com.zerotoheroes.artifact --output-template-file template.packaged.yaml",
 		"deploy": "sam deploy --template-file template.packaged.yaml --stack-name TriggerBuildDuelsStatsStack --capabilities CAPABILITY_IAM",
-		"clean": "rm -rf -v dist/*"
+		"clean": "rm -rf -v dist/*",
+		"full-deploy": "rm -rf dist && npm run build && npm run package && npm run deploy"
 	},
 	"repository": {},
 	"author": "",
@@ -23,7 +24,7 @@
 	"dependencies": {
 		"@firestone-hs/aws-lambda-utils": "0.0.27",
 		"@firestone-hs/hs-replay-xml-parser": "0.0.55",
-		"@firestone-hs/reference-data": "^1.0.40",
+		"@firestone-hs/reference-data": "^1.0.72",
 		"@types/elementtree": "^0.1.0",
 		"aws-sdk": "^2.1044.0",
 		"cross-fetch": "^3.1.5",

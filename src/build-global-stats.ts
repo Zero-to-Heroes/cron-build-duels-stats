@@ -1,36 +1,9 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { groupByFunction, http } from '@firestone-hs/aws-lambda-utils';
-import { AllCardsService, CardIds } from '@firestone-hs/reference-data';
+import { AllCardsService, allDuelsTreasureCardIds, CardIds } from '@firestone-hs/reference-data';
 import { ServerlessMysql } from 'serverless-mysql';
 import { DateMark, DuelsHeroStat, DuelsTreasureStat, InternalDuelsStat, MmrPercentile } from './stat';
 import { formatDate } from './utils/util-functions';
-
-export const TREASURES_REMOVED_CARDS = [
-	CardIds.RobesOfGaudiness,
-	CardIds.HeadmasterKelthuzad_MrBigglesworthToken,
-	CardIds.GattlingGunner,
-	CardIds.PhaorisBladeTavernBrawl,
-	CardIds.SandySurpriseTavernBrawl,
-	CardIds.LunarBandTavernBrawl,
-	CardIds.StickyFingers,
-	CardIds.BandOfBees,
-	// 21.6
-	CardIds.SmallPouchesTavernBrawl,
-	CardIds.RhoninsScryingOrbTavernBrawl,
-	CardIds.Caltrops,
-	CardIds.ScatteredCaltropsTavernBrawl,
-	// 22.2
-	CardIds.FireshaperTavernBrawl,
-	CardIds.EverChangingElixirTavernBrawl,
-	CardIds.LocuuuustsTavernBrawl,
-	CardIds.ConduitOfTheStormsTavernBrawl,
-	// 23.2
-	CardIds.DragonAffinity,
-	CardIds.DragonAffinityTavernBrawl,
-	CardIds.DisksOfLegend,
-	// 24.0
-	CardIds.PlaguebringerTavernBrawl,
-];
 
 const allCards = new AllCardsService();
 
@@ -197,7 +170,7 @@ const buildTreasuresForMmr = (
 			}
 			return row;
 		})
-		.filter(info => !TREASURES_REMOVED_CARDS.includes(info.treasure as CardIds));
+		.filter(info => allDuelsTreasureCardIds.includes(info.treasure as CardIds));
 	console.log('denormalized rows', denormalizedRows.length, denormalizedRows[0]);
 
 	const allTimeTreasures = buildTreasureStats(denormalizedRows, 'all-time');
