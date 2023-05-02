@@ -9,7 +9,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: _build-duels-stats.default
-            Runtime: nodejs12.x
+            Runtime: nodejs16.x
             Timeout: 900
             CodeUri: ./dist/_build-duels-stats
             MemorySize: 2000
