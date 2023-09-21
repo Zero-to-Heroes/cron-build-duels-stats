@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { getConnection, S3 } from '@firestone-hs/aws-lambda-utils';
+import { getConnectionReadOnly, S3 } from '@firestone-hs/aws-lambda-utils';
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { constants, gzipSync } from 'zlib';
 import { loadDeckStats } from './build-deck-stats';
@@ -21,7 +21,7 @@ export default async (event): Promise<any> => {
 
 const handleSplitDuelsStats = async () => {
 	console.log('building new stats with hero class');
-	const mysql = await getConnection();
+	const mysql = await getConnectionReadOnly();
 	const stats: InternalDuelsStat = await loadStats(mysql);
 	await mysql.end();
 	if (!stats) {
@@ -38,11 +38,11 @@ const handleSplitDuelsStats = async () => {
 			const partialStats: DuelsStat = {
 				...stats,
 				heroes: stats.heroes
-					.filter(stat => stat.mmrPercentile === percentile.percentile)
-					.filter(stat => stat.date === dateMark),
+					.filter((stat) => stat.mmrPercentile === percentile.percentile)
+					.filter((stat) => stat.date === dateMark),
 				treasures: stats.treasures
-					.filter(stat => stat.mmrPercentile === percentile.percentile)
-					.filter(stat => stat.date === dateMark),
+					.filter((stat) => stat.mmrPercentile === percentile.percentile)
+					.filter((stat) => stat.date === dateMark),
 			};
 			delete (partialStats as any).decks;
 			const gzipped = gzipSync(JSON.stringify(partialStats), {
@@ -61,7 +61,7 @@ const handleSplitDuelsStats = async () => {
 	}
 
 	console.log('building stats for decks');
-	const mysql2 = await getConnection();
+	const mysql2 = await getConnectionReadOnly();
 	const decks: readonly DeckStat[] = await loadDeckStats(mysql2);
 	await mysql2.end();
 	const statsForDecks: DuelsStatDecks = {
