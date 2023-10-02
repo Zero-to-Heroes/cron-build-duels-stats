@@ -35,14 +35,17 @@ const handleSplitDuelsStats = async () => {
 	for (const percentile of stats.mmrPercentiles) {
 		for (const dateMark of stats.dates) {
 			console.log('filtering stats for', percentile, dateMark);
+			const heroStats = stats.heroes
+				.filter((stat) => stat.mmrPercentile === percentile.percentile)
+				.filter((stat) => stat.date === dateMark);
+			const treasureStats = stats.treasures
+				.filter((stat) => stat.mmrPercentile === percentile.percentile)
+				.filter((stat) => stat.date === dateMark);
 			const partialStats: DuelsStat = {
 				...stats,
-				heroes: stats.heroes
-					.filter((stat) => stat.mmrPercentile === percentile.percentile)
-					.filter((stat) => stat.date === dateMark),
-				treasures: stats.treasures
-					.filter((stat) => stat.mmrPercentile === percentile.percentile)
-					.filter((stat) => stat.date === dateMark),
+				heroes: heroStats,
+				treasures: treasureStats,
+				dataPoints: heroStats.map((s) => s.totalMatches).reduce((a, b) => a + b, 0),
 			};
 			delete (partialStats as any).decks;
 			const gzipped = gzipSync(JSON.stringify(partialStats), {

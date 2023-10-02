@@ -5,6 +5,7 @@ export interface DuelsStat {
 	readonly lastUpdateDate: string;
 	readonly heroes: readonly DuelsHeroStat[];
 	readonly treasures: readonly DuelsTreasureStat[];
+	readonly dataPoints: number;
 	readonly mmrPercentiles: readonly MmrPercentile[];
 	readonly dates: readonly DateMark[];
 }
