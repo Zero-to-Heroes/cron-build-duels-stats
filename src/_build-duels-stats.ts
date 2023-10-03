@@ -46,6 +46,7 @@ const handleSplitDuelsStats = async () => {
 				heroes: heroStats,
 				treasures: treasureStats,
 				dataPoints: heroStats.map((s) => s.totalMatches).reduce((a, b) => a + b, 0),
+				dataPointsRuns: heroStats.map((s) => s.totalRuns).reduce((a, b) => a + b, 0),
 			};
 			delete (partialStats as any).decks;
 			const gzipped = gzipSync(JSON.stringify(partialStats), {
