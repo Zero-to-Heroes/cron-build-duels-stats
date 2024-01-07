@@ -12,7 +12,7 @@ Resources:
             Runtime: nodejs16.x
             Timeout: 900
             CodeUri: ./dist/_build-duels-stats
-            MemorySize: 2000
+            MemorySize: 4000
             Policies:
                 - AWSLambdaVPCAccessExecutionRole
                 - AmazonSESFullAccess
