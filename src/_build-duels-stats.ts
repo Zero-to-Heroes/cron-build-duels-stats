@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { getConnectionReadOnly, S3 } from '@firestone-hs/aws-lambda-utils';
+import { getConnectionReadOnly, logBeforeTimeout, S3 } from '@firestone-hs/aws-lambda-utils';
 import { AllCardsService } from '@firestone-hs/reference-data';
 import { constants, gzipSync } from 'zlib';
 import { loadDeckStats } from './build-deck-stats';
@@ -13,9 +13,11 @@ const s3 = new S3();
 // This example demonstrates a NodeJS 8.10 async handler[1], however of course you could use
 // the more traditional callback-style handler.
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
-export default async (event): Promise<any> => {
+export default async (event, context): Promise<any> => {
+	const cleanup = logBeforeTimeout(context);
 	await cards.initializeCardsDb();
 	await handleSplitDuelsStats();
+	cleanup();
 	return { statusCode: 200, body: null };
 };
 
